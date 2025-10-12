@@ -1,0 +1,28 @@
+<div class="container">
+  <h2>Formulário de Tarefas</h2>
+  <div>
+    <div class="mb-3">
+      <label for="titulo" class="form-label">Título:</label>
+      <input type="text" [(ngModel)]="tarefas().titulo" id="titulo" class="form-control" placeholder="Digite o título">
+    </div>
+
+    <div class="mb-3">
+      <label for="descricao" class="form-label">Descrição:</label>
+      <input type="text" [(ngModel)]="tarefas().descricao" id="descricao" class="form-control" placeholder="Descrição">
+    </div>
+
+    <div class="mb-3">
+      <label for="prioridade" class="form-label">Prioridade:</label>
+      <input type="number" [(ngModel)]="tarefas().prioridade" id="prioridade" class="form-control" placeholder="1-5">
+    </div>
+
+    <div class="mb-3">
+      <label>
+        <input type="checkbox" [(ngModel)]="tarefas().concluida"> Concluída
+      </label>
+    </div>
+
+    <button class="btn btn-primary me-3" (click)="salvar()">{{botaoAcao}}</button>
+    <button class="btn btn-secondary" (click)="voltar()">Voltar</button>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+<div class="card shadow">
+  <div class="card-header">
+    <img src="/imagem.png" alt="tarefa" class="card-img-top">
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{ tarefa.titulo }}</h5>
+    <p class="card-text">{{ tarefa.descricao }}</p>
+    <p class="card-text"><strong>Prioridade:</strong> {{ tarefa.prioridade }}</p>
+    <p class="card-text"><strong>Concluída:</strong> {{ tarefa.concluida ? 'Sim' : 'Não' }}</p>
+  </div>
+</div>
