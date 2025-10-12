@@ -1,0 +1,133 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h2 class="login-title">
+        {{ isLoginMode() ? 'Entrar' : 'Criar Conta' }}
+      </h2>
+      <p class="login-subtitle">
+        {{ isLoginMode() ? 'Acesse sua conta para continuar' : 'Crie uma nova conta para começar' }}
+      </p>
+    </div>
+
+    <form [formGroup]="isLoginMode() ? loginForm : registerForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Campo Nome (apenas no registro) -->
+      @if (!isLoginMode()) {
+        <div class="form-group">
+        <label for="nome" class="form-label">Nome</label>
+        <input
+          type="text"
+          id="nome"
+          formControlName="nome"
+          class="form-control"
+          [class.is-invalid]="registerForm.get('nome')?.invalid && registerForm.get('nome')?.touched"
+          placeholder="Digite seu nome completo"
+        >
+        @if (getFieldError(registerForm, 'nome')) {
+          <div class="invalid-feedback">
+            {{ getFieldError(registerForm, 'nome') }}
+          </div>
+        }
+        </div>
+      }
+
+      <!-- Campo Email -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="(isLoginMode() ? loginForm : registerForm).get('email')?.invalid && (isLoginMode() ? loginForm : registerForm).get('email')?.touched"
+          placeholder="Digite seu email"
+        >
+        @if (getFieldError(isLoginMode() ? loginForm : registerForm, 'email')) {
+          <div class="invalid-feedback">
+            {{ getFieldError(isLoginMode() ? loginForm : registerForm, 'email') }}
+          </div>
+        }
+      </div>
+
+      <!-- Campo Senha -->
+      <div class="form-group">
+        <label for="senha" class="form-label">Senha</label>
+        <input
+          type="password"
+          id="senha"
+          formControlName="senha"
+          class="form-control"
+          [class.is-invalid]="(isLoginMode() ? loginForm : registerForm).get('senha')?.invalid && (isLoginMode() ? loginForm : registerForm).get('senha')?.touched"
+          placeholder="Digite sua senha"
+        >
+        @if (getFieldError(isLoginMode() ? loginForm : registerForm, 'senha')) {
+          <div class="invalid-feedback">
+            {{ getFieldError(isLoginMode() ? loginForm : registerForm, 'senha') }}
+          </div>
+        }
+      </div>
+
+      <!-- Campo Confirmar Senha (apenas no registro) -->
+      @if (!isLoginMode()) {
+        <div class="form-group">
+        <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
+        <input
+          type="password"
+          id="confirmarSenha"
+          formControlName="confirmarSenha"
+          class="form-control"
+          [class.is-invalid]="registerForm.get('confirmarSenha')?.invalid && registerForm.get('confirmarSenha')?.touched"
+          placeholder="Confirme sua senha"
+        >
+        @if (getFieldError(registerForm, 'confirmarSenha')) {
+          <div class="invalid-feedback">
+            {{ getFieldError(registerForm, 'confirmarSenha') }}
+          </div>
+        }
+        </div>
+      }
+
+      <!-- Mensagem de erro -->
+      @if (errorMessage()) {
+        <div class="alert alert-danger">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <!-- Botão de submit -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-block"
+        [disabled]="isLoading() || (isLoginMode() ? loginForm.invalid : registerForm.invalid)"
+      >
+        @if (isLoading()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        {{ isLoading() ? 'Processando...' : (isLoginMode() ? 'Entrar' : 'Criar Conta') }}
+      </button>
+    </form>
+
+    <!-- Link para alternar entre login e registro -->
+    <div class="login-footer">
+      <p class="text-center">
+        {{ isLoginMode() ? 'Não tem uma conta?' : 'Já tem uma conta?' }}
+        <button
+          type="button"
+          class="btn btn-link p-0"
+          (click)="toggleMode()"
+          [disabled]="isLoading()"
+        >
+          {{ isLoginMode() ? 'Criar conta' : 'Fazer login' }}
+        </button>
+      </p>
+    </div>
+
+    <!-- Credenciais de demonstração -->
+    <div *ngIf="isLoginMode()" class="demo-credentials">
+      <div class="alert alert-info">
+        <h6>Credenciais de Demonstração:</h6>
+        <p class="mb-1"><strong>Email:</strong> admin@taskmaster.com</p>
+        <p class="mb-0"><strong>Senha:</strong> 123456</p>
+      </div>
+    </div>
+  </div>
+</div>

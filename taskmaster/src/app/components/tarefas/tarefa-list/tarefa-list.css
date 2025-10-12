@@ -1,0 +1,30 @@
+.prioridade-alta {
+  background-color: #dc3545; /* Red */
+  color: white;
+}
+
+.prioridade-media {
+  background-color: #ffc107; /* Yellow */
+  color: #212529; /* Dark text for contrast */
+}
+
+.prioridade-baixa {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+
+.status-pendente {
+  background-color: #ffc107; /* Yellow */
+  color: #212529;
+}
+
+.status-concluida {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+
+.filter-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}

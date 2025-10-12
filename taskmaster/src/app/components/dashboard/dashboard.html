@@ -1,0 +1,162 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">
+      Olá, {{ getUserName() }}! 👋
+    </h1>
+    <p class="dashboard-subtitle">
+      Aqui está um resumo das suas tarefas
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Carregando dados...</p>
+    </div>
+  }
+
+  <!-- Dashboard Content -->
+  @if (!isLoading()) {
+    <div class="dashboard-content">
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <h3>{{ totalTarefas() }}</h3>
+          <p>Total de Tarefas</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <h3>{{ tarefasPendentes() }}</h3>
+          <p>Tarefas Pendentes</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>{{ tarefasConcluidas() }}</h3>
+          <p>Tarefas Concluídas</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🏷️</div>
+        <div class="stat-content">
+          <h3>{{ totalCategorias() }}</h3>
+          <p>Categorias</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="progress-section">
+      <div class="progress-card">
+        <h3>Progresso Geral</h3>
+        <div class="progress-bar">
+          <div 
+            class="progress-fill" 
+            [style.width.%]="getProgressPercentage()"
+          ></div>
+        </div>
+        <p class="progress-text">{{ getProgressPercentage() }}% concluído</p>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+      <!-- Tasks by Priority -->
+      <div class="chart-card">
+        <h3>Tarefas por Prioridade</h3>
+        <div class="priority-chart">
+          <div class="priority-item">
+            <div class="priority-color alta"></div>
+            <span class="priority-label">Alta</span>
+            <span class="priority-count">{{ getTarefasPorPrioridade()['alta'] }}</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-color media"></div>
+            <span class="priority-label">Média</span>
+            <span class="priority-count">{{ getTarefasPorPrioridade()['media'] }}</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-color baixa"></div>
+            <span class="priority-label">Baixa</span>
+            <span class="priority-count">{{ getTarefasPorPrioridade()['baixa'] }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Tasks -->
+      <div class="chart-card">
+        <h3>Tarefas Recentes</h3>
+        <div class="recent-tasks">
+          <div *ngFor="let tarefa of getTarefasRecentes()" class="recent-task-item">
+            <div class="task-info">
+              <h4 class="task-title">{{ tarefa.titulo }}</h4>
+              <p class="task-meta">
+                <span 
+                  class="task-category"
+                  [style.color]="getCategoriaCor(tarefa.categoriaId)"
+                >
+                  {{ getCategoriaNome(tarefa.categoriaId) }}
+                </span>
+                <span class="task-date">{{ formatDate(tarefa.dataCriacao) }}</span>
+              </p>
+            </div>
+            <div class="task-status">
+              <span 
+                class="status-badge"
+                [class.pendente]="tarefa.status === 'pendente'"
+                [class.concluida]="tarefa.status === 'concluida'"
+              >
+                {{ tarefa.status === 'pendente' ? 'Pendente' : 'Concluída' }}
+              </span>
+            </div>
+          </div>
+          
+          <div *ngIf="getTarefasRecentes().length === 0" class="empty-state">
+            <p>Nenhuma tarefa encontrada</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h3>Ações Rápidas</h3>
+      <div class="actions-grid">
+        <a routerLink="/tarefas/nova" class="action-card">
+          <div class="action-icon">➕</div>
+          <h4>Nova Tarefa</h4>
+          <p>Criar uma nova tarefa</p>
+        </a>
+        
+        <a routerLink="/categorias/nova" class="action-card">
+          <div class="action-icon">🏷️</div>
+          <h4>Nova Categoria</h4>
+          <p>Criar uma nova categoria</p>
+        </a>
+        
+        <a routerLink="/tarefas" class="action-card">
+          <div class="action-icon">📋</div>
+          <h4>Ver Todas</h4>
+          <p>Visualizar todas as tarefas</p>
+        </a>
+        
+        <a routerLink="/categorias" class="action-card">
+          <div class="action-icon">🏷️</div>
+          <h4>Gerenciar</h4>
+          <p>Gerenciar categorias</p>
+        </a>
+      </div>
+    </div>
+    </div>
+  }
+</div>

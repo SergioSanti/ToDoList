@@ -1,0 +1,191 @@
+<div class="tarefa-list-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Tarefas</h1>
+      <p class="page-subtitle">Gerencie suas tarefas e acompanhe o progresso</p>
+    </div>
+    <a routerLink="/tarefas/nova" class="btn btn-primary">
+      <span class="btn-icon">➕</span>
+      Nova Tarefa
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <div class="spinner"></div>
+    <p>Carregando tarefas...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading()" class="content">
+    <!-- Filters -->
+    <div class="filters-card">
+      <h3>Filtros</h3>
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="status">Status:</label>
+          <select 
+            id="status"
+            [value]="filtros().status"
+            (change)="updateFiltro('status', $any($event.target).value)"
+            class="form-control"
+          >
+            <option value="todas">Todas</option>
+            <option value="pendente">Pendentes</option>
+            <option value="concluida">Concluídas</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="prioridade">Prioridade:</label>
+          <select 
+            id="prioridade"
+            [value]="filtros().prioridade"
+            (change)="updateFiltro('prioridade', $any($event.target).value)"
+            class="form-control"
+          >
+            <option value="todas">Todas</option>
+            <option value="alta">Alta</option>
+            <option value="media">Média</option>
+            <option value="baixa">Baixa</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="categoria">Categoria:</label>
+          <select 
+            id="categoria"
+            [value]="filtros().categoriaId"
+            (change)="updateFiltro('categoriaId', +$any($event.target).value)"
+            class="form-control"
+          >
+            <option value="0">Todas</option>
+            @for (categoria of categorias(); track categoria.id) {
+              <option [value]="categoria.id">
+                {{ categoria.nome }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="busca">Buscar:</label>
+          <input 
+            type="text"
+            id="busca"
+            [value]="filtros().termo"
+            (input)="updateFiltro('termo', $any($event.target).value)"
+            placeholder="Digite para buscar..."
+            class="form-control"
+          >
+        </div>
+
+        <div class="filter-group">
+          <button 
+            type="button"
+            (click)="limparFiltros()"
+            class="btn btn-secondary"
+          >
+            Limpar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tasks List -->
+    <div class="tasks-container">
+      @if ((tarefas() | filtroTarefa:filtros()).length === 0) {
+        <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <h3>Nenhuma tarefa encontrada</h3>
+        @if (filtros().status === 'todas' && filtros().prioridade === 'todas' && filtros().categoriaId === 0 && !filtros().termo) {
+          <p>Você ainda não tem tarefas cadastradas.</p>
+          <a routerLink="/tarefas/nova" class="btn btn-primary">
+            Criar Primeira Tarefa
+          </a>
+        } @else {
+          <p>Nenhuma tarefa corresponde aos filtros aplicados.</p>
+        }
+        </div>
+      }
+
+      @for (tarefa of (tarefas() | filtroTarefa:filtros()); track tarefa.id) {
+        <div class="task-card">
+        <div class="task-content">
+          <div class="task-header">
+            <h3 class="task-title">{{ tarefa.titulo }}</h3>
+            <div class="task-actions">
+              <button 
+                type="button"
+                (click)="toggleStatus(tarefa)"
+                class="btn btn-sm"
+                [class.btn-success]="tarefa.status === 'pendente'"
+                [class.btn-warning]="tarefa.status === 'concluida'"
+                [title]="tarefa.status === 'pendente' ? 'Marcar como concluída' : 'Marcar como pendente'"
+              >
+                {{ tarefa.status === 'pendente' ? '✅' : '⏳' }}
+              </button>
+              
+              <a 
+                [routerLink]="['/tarefas/editar', tarefa.id]"
+                class="btn btn-sm btn-secondary"
+                title="Editar tarefa"
+              >
+                ✏️
+              </a>
+              
+              <button 
+                type="button"
+                (click)="deleteTarefa(tarefa)"
+                class="btn btn-sm btn-danger"
+                title="Excluir tarefa"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+
+          <p class="task-description">{{ tarefa.descricao }}</p>
+
+          <div class="task-meta">
+            <div class="task-info">
+              <span 
+                class="priority-badge"
+                [class]="getPrioridadeClass(tarefa.prioridade)"
+              >
+                {{ getPrioridadeLabel(tarefa.prioridade) }}
+              </span>
+              
+              <span 
+                class="category-badge"
+                [style.background-color]="getCategoriaCor(tarefa.categoriaId)"
+              >
+                {{ getCategoriaNome(tarefa.categoriaId) }}
+              </span>
+              
+              <span 
+                class="status-badge"
+                [class]="getStatusClass(tarefa.status)"
+              >
+                {{ getStatusLabel(tarefa.status) }}
+              </span>
+            </div>
+
+            <div class="task-dates">
+              <span class="date-info">
+                <strong>Criada:</strong> {{ formatDate(tarefa.dataCriacao) }}
+              </span>
+              @if (tarefa.dataConclusao) {
+                <span class="date-info">
+                  <strong>Concluída:</strong> {{ formatDate(tarefa.dataConclusao) }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+/* Adicione estilos específicos para o dashboard aqui, se necessário */
+.priority-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.priority-item {
+  display: flex;
+  align-items: center;
+}
+
+.priority-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.priority-color.alta { background-color: #dc3545; } /* Red */
+.priority-color.media { background-color: #ffc107; } /* Yellow */
+.priority-color.baixa { background-color: #28a745; } /* Green */
+
+.priority-label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.priority-count {
+  font-size: 1.1em;
+}
