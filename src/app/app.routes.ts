@@ -3,12 +3,21 @@ import { TabelaTarefas } from './tabela-tarefas/tabela-tarefas';
 import { FormTarefas } from './form-tarefas/form-tarefas';
 import { ListCardTarefas } from './list-card-tarefas/list-card-tarefas';
 import { PageNotFound } from './page-not-found/page-not-found';
+import { Login } from './login/login';
+import { authGuard } from './auth/auth-guard-guard';
 
 export const routes: Routes = [
-    { path: 'tabela', component: TabelaTarefas },       // Página com tabela de tarefas
-    { path: 'novo', component: FormTarefas },           // Página para criar nova tarefa
-    { path: 'lista', component: ListCardTarefas },      // Página com cards das tarefas
-    { path: 'edit/:id', component: FormTarefas },       // Página para editar tarefa existente
-    { path: '', redirectTo: '/lista', pathMatch: 'full'}, // Redireciona para lista ao acessar raiz
-    { path: '**', component: PageNotFound }             // Página 404 para rotas inválidas
+  { path: 'login', component: Login },
+
+  // Rotas protegidas (só acessa se estiver logado)
+  { path: 'tabela', component: TabelaTarefas, canActivate: [authGuard] },
+  { path: 'novo', component: FormTarefas, canActivate: [authGuard] },
+  { path: 'lista', component: ListCardTarefas, canActivate: [authGuard] },
+  { path: 'edit/:id', component: FormTarefas, canActivate: [authGuard] },
+
+  // Redireciona para login se tentar acessar a raiz
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+
+  // Página 404
+  { path: '**', component: PageNotFound }
 ];
