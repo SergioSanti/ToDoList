@@ -30,7 +30,13 @@ export class CategoriaApiService {
 
   editar(id: number, categoria: Categoria): Observable<Categoria> {
     const index = this.listaCategorias.findIndex(c => c.id === id);
-    this.listaCategorias[index] = categoria;
+    if (index >= 0) {
+      // Preserva o ID original
+      categoria.id = id;
+      this.listaCategorias[index] = categoria;
+      return of(categoria);
+    }
+    // Se não encontrar, retorna a categoria como está
     return of(categoria);
   }
 

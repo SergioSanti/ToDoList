@@ -1,7 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { TarefasApiService } from '../tarefas-api-service';
 import { CategoriaApiService } from '../categoria-api-service';
 import { Tarefas } from '../tarefas';
@@ -21,6 +21,7 @@ export class TabelaTarefas {
   categorias = signal<Categoria[]>([]);
   private tarefasApiService = inject(TarefasApiService);
   private categoriaApiService = inject(CategoriaApiService);
+  private router = inject(Router);
 
   constructor() {
     this.tarefasApiService.listar().subscribe((tarefas) => {

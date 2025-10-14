@@ -1,16 +1,44 @@
 <div class="container mt-4">
-  <h2 class="mb-4 text-center">Lista de Tarefas</h2>
+  <h2 class="mb-4 text-center">Lista Completa de Tarefas</h2>
 
   <div class="row gy-3">
     @for (tarefa of tarefas(); track tarefa.id) {
       <div class="col-md-4">
-        <div class="card shadow">
+        <div class="card shadow" [style.border-left]="'5px solid ' + getCategoriaCor(tarefa.categoriaId)">
           <div class="card-body">
             <h5 class="card-title">{{ tarefa.titulo }}</h5>
             <p class="card-text">{{ tarefa.descricao }}</p>
-            <p class="card-text"><strong>Categoria:</strong> {{ getCategoriaNome(tarefa.categoriaId) }}</p>
-            <p class="card-text"><strong>Prioridade:</strong> {{ tarefa.prioridade }}</p>
-            <p class="card-text"><strong>Concluída:</strong> {{ tarefa.concluida ? 'Sim' : 'Não' }}</p>
+            
+            <div class="mb-2">
+              <strong>Categoria:</strong> 
+              <span class="badge" [style.background-color]="getCategoriaCor(tarefa.categoriaId)" [style.color]="getContrastColor(getCategoriaCor(tarefa.categoriaId))">
+                {{ getCategoriaNome(tarefa.categoriaId) }}
+              </span>
+            </div>
+            
+            <div class="row">
+              <div class="col-6">
+                <p class="card-text mb-1">
+                  <strong>Prioridade:</strong> 
+                  <span class="badge" [ngClass]="{
+                    'bg-danger': tarefa.prioridade >= 4,
+                    'bg-warning': tarefa.prioridade === 3,
+                    'bg-info': tarefa.prioridade === 2,
+                    'bg-success': tarefa.prioridade === 1
+                  }">
+                    {{ tarefa.prioridade }}
+                  </span>
+                </p>
+              </div>
+              <div class="col-6">
+                <p class="card-text mb-1">
+                  <strong>Status:</strong> 
+                  <span class="badge" [ngClass]="tarefa.concluida ? 'bg-success' : 'bg-secondary'">
+                    {{ tarefa.concluida ? 'Concluída' : 'Pendente' }}
+                  </span>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

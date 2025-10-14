@@ -20,7 +20,9 @@ export class FormCategoria {
   router = inject(Router);
 
   constructor() {
-    this.id = this.route.snapshot.params['id'];
+    const idParam = this.route.snapshot.params['id'];
+    this.id = idParam ? +idParam : undefined; // Converte string para number
+    
     if(this.id) {
       this.botaoAcao = "Editar";
       this.categoriaApiService.buscarPorId(this.id).subscribe(c => {
@@ -33,6 +35,7 @@ export class FormCategoria {
     if(this.id) {
       this.categoriaApiService.editar(this.id, this.categoria()).subscribe(() => {
         alert('Categoria editada com sucesso!');
+        this.router.navigate(['/tabela-categoria']);
       });
     } else {
       this.categoriaApiService.inserir(this.categoria()).subscribe(() => {

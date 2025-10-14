@@ -29,8 +29,25 @@ export class TarefasApiService {
   }
 
   editar(id: number, tarefa: Tarefas): Observable<Tarefas> {
+    console.log('Editando tarefa com ID:', id, 'Tipo:', typeof id);
+    console.log('Lista atual:', this.listaTarefas);
+    
     const index = this.listaTarefas.findIndex(t => t.id === id);
-    this.listaTarefas[index] = tarefa;
+    console.log('Índice encontrado:', index);
+    
+    if (index >= 0) {
+      // Preserva o ID original
+      tarefa.id = id;
+      this.listaTarefas[index] = tarefa;
+      console.log('Tarefa editada:', tarefa);
+      console.log('Lista após edição:', this.listaTarefas);
+      return of(tarefa);
+    }
+    
+    console.log('Tarefa não encontrada, adicionando nova');
+    // Se não encontrar, adiciona como nova tarefa
+    tarefa.id = this.listaTarefas.length + 1;
+    this.listaTarefas.push(tarefa);
     return of(tarefa);
   }
 
