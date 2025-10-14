@@ -23,7 +23,9 @@ export class FormCategoria {
     this.id = this.route.snapshot.params['id'];
     if(this.id) {
       this.botaoAcao = "Editar";
-      this.categoriaApiService.buscarPorId(this.id).subscribe(c => this.categoria.set(c));
+      this.categoriaApiService.buscarPorId(this.id).subscribe(c => {
+        this.categoria.set(c);
+      });
     }
   }
 

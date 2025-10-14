@@ -14,7 +14,11 @@ export class CategoriaApiService {
   }
 
   buscarPorId(id?: number): Observable<Categoria> {
-    const categoria = this.listaCategorias.find(c => c.id === id)!;
+    const categoria = this.listaCategorias.find(c => c.id === id);
+    if (!categoria) {
+      // Retorna uma categoria vazia se não encontrar
+      return of({ id: 0, nome: '', descricao: '', cor: '#007bff' });
+    }
     return of(categoria);
   }
 

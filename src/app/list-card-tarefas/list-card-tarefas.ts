@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TarefasService } from '../tarefas-service';
-import { CategoriaService } from '../categoria-service';
+import { TarefasApiService } from '../tarefas-api-service';
+import { CategoriaApiService } from '../categoria-api-service';
 import { Tarefas } from '../tarefas';
 import { Categoria } from '../categoria';
 
@@ -15,12 +15,17 @@ import { Categoria } from '../categoria';
 export class ListCardTarefas {
   tarefas = signal<Tarefas[]>([]);
   categorias = signal<Categoria[]>([]);
-  private tarefasService = inject(TarefasService);
-  private categoriaService = inject(CategoriaService);
+  private tarefasApiService = inject(TarefasApiService);
+  private categoriaApiService = inject(CategoriaApiService);
 
   constructor() {
-    this.tarefas.set(this.tarefasService.listar());
-    this.categorias.set(this.categoriaService.listar());
+    this.tarefasApiService.listar().subscribe(tarefas => {
+      this.tarefas.set(tarefas);
+    });
+    
+    this.categoriaApiService.listar().subscribe(categorias => {
+      this.categorias.set(categorias);
+    });
   }
 
   getCategoriaNome(categoriaId: number): string {

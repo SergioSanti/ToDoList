@@ -1,26 +1,26 @@
 <h1 class="text-center mt-3">Sistema de Tarefas e Categorias</h1>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <ul class="navbar-nav">
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                Tarefas
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" routerLink="/lista">Lista</a></li>
-                <li><a class="dropdown-item" routerLink="/tabela">Tabela</a></li>
-                <li><a class="dropdown-item" routerLink="/novo">Cadastro</a></li>
-            </ul>
-        </li>
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                Categorias
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" routerLink="/lista-categoria">Lista</a></li>
-                <li><a class="dropdown-item" routerLink="/tabela-categoria">Tabela</a></li>
-                <li><a class="dropdown-item" routerLink="/novo-categoria">Cadastro</a></li>
-            </ul>
-        </li>
-    </ul>
+    <div class="container-fluid">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/lista">Tarefas - Lista</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/tabela">Tarefas - Tabela</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/novo">Tarefas - Cadastro</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/lista-categoria">Categorias - Lista</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/tabela-categoria">Categorias - Tabela</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/novo-categoria">Categorias - Cadastro</a>
+            </li>
+        </ul>
+    </div>
 </nav>
 <router-outlet />

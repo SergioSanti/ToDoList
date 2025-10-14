@@ -14,7 +14,11 @@ export class TarefasApiService {
   }
 
   buscarPorId(id?: number): Observable<Tarefas> {
-    const tarefa = this.listaTarefas.find(t => t.id === id)!;
+    const tarefa = this.listaTarefas.find(t => t.id === id);
+    if (!tarefa) {
+      // Retorna uma tarefa vazia se não encontrar
+      return of({ id: 0, titulo: '', descricao: '', prioridade: 1, concluida: false, categoriaId: 1 });
+    }
     return of(tarefa);
   }
 

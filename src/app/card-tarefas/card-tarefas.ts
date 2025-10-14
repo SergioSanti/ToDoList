@@ -1,6 +1,6 @@
 import { Component, Input, inject, signal } from '@angular/core';
 import { Tarefas } from '../tarefas';
-import { CategoriaService } from '../categoria-service';
+import { CategoriaApiService } from '../categoria-api-service';
 import { Categoria } from '../categoria';
 
 @Component({
@@ -12,10 +12,12 @@ import { Categoria } from '../categoria';
 export class CardTarefas {
   @Input() tarefa!: Tarefas;
   categorias = signal<Categoria[]>([]);
-  private categoriaService = inject(CategoriaService);
+  private categoriaApiService = inject(CategoriaApiService);
 
   constructor() {
-    this.categorias.set(this.categoriaService.listar());
+    this.categoriaApiService.listar().subscribe(categorias => {
+      this.categorias.set(categorias);
+    });
   }
 
   getCategoriaNome(categoriaId: number): string {

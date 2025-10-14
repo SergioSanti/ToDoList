@@ -12,7 +12,7 @@ export class AuthService {
       (username === 'admin' && senha === '1234') ||
       (username === 'teste' && senha === 'senha')
     ) {
-      sessionStorage.setItem('token', 'fake-jwt-token');
+      localStorage.setItem('token', 'fake-jwt-token');
       return of(true);
     } else {
       return of(false);
@@ -20,11 +20,11 @@ export class AuthService {
   }
 
   estaLogado(): boolean {
-    const token = sessionStorage.getItem('token');
-    return token !== undefined && token !== null;
+    const token = localStorage.getItem('token');
+    return token === 'fake-jwt-token';
   }
 
   logout(): void {
-    sessionStorage.removeItem('token');
+    localStorage.removeItem('token');
   }
 }

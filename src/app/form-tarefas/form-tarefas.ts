@@ -27,7 +27,9 @@ export class FormTarefas {
     this.id = this.route.snapshot.params['id'];
     if(this.id) {
       this.botaoAcao = "Editar";
-      this.tarefasApiService.buscarPorId(this.id).subscribe(t => this.tarefas.set(t));
+      this.tarefasApiService.buscarPorId(this.id).subscribe(t => {
+        this.tarefas.set(t);
+      });
     }
     
     // Carrega as categorias para o select
