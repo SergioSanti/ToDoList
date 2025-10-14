@@ -2,7 +2,8 @@
   <div class="card-body">
     <h5 class="card-title">{{tarefa.titulo}}</h5>
     <p class="card-text">{{tarefa.descricao}}</p>
-    <p>Prioridade: {{tarefa.prioridade}}</p>
-    <p>Status: {{tarefa.concluida ? 'Concluída' : 'Pendente'}}</p>
+    <p class="card-text"><strong>Categoria:</strong> {{ getCategoriaNome(tarefa.categoriaId) }}</p>
+    <p class="card-text"><strong>Prioridade:</strong> {{tarefa.prioridade}}</p>
+    <p class="card-text"><strong>Status:</strong> {{tarefa.concluida ? 'Concluída' : 'Pendente'}}</p>
   </div>
 </div>

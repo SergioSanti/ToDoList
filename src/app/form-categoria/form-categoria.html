@@ -1,0 +1,25 @@
+<div class="container mt-4">
+  <h2>{{botaoAcao}} Categoria</h2>
+  
+  <form (ngSubmit)="salvar()">
+    <div class="mb-3">
+      <label for="nome" class="form-label">Nome:</label>
+      <input type="text" [(ngModel)]="categoria().nome" id="nome" name="nome" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="descricao" class="form-label">Descrição:</label>
+      <textarea [(ngModel)]="categoria().descricao" id="descricao" name="descricao" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="cor" class="form-label">Cor:</label>
+      <input type="color" [(ngModel)]="categoria().cor" id="cor" name="cor" class="form-control form-control-color">
+    </div>
+
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary me-2">{{botaoAcao}}</button>
+      <button type="button" class="btn btn-secondary" (click)="voltar()">Voltar</button>
+    </div>
+  </form>
+</div>

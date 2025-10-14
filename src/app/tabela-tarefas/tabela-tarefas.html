@@ -13,6 +13,7 @@
           <th>ID</th>
           <th>TÍTULO</th>
           <th>DESCRIÇÃO</th>
+          <th>CATEGORIA</th>
           <th>PRIORIDADE</th>
           <th>CONCLUÍDA</th>
           <th colspan="2">AÇÃO</th>
@@ -24,6 +25,7 @@
             <td>{{tarefa.id}}</td>
             <td>{{tarefa.titulo}}</td>
             <td>{{tarefa.descricao}}</td>
+            <td>{{getCategoriaNome(tarefa.categoriaId)}}</td>
             <td>{{tarefa.prioridade}}</td>
             <td>{{tarefa.concluida ? 'Sim' : 'Não'}}</td>
             <td><a class="btn btn-primary" routerLink="/edit/{{tarefa.id}}">Editar</a></td>

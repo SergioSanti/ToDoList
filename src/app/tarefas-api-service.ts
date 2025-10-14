@@ -5,8 +5,8 @@ import { Tarefas } from './tarefas';
 @Injectable({ providedIn: 'root' })
 export class TarefasApiService {
   private listaTarefas: Tarefas[] = [
-    { id:1, titulo:'Comprar leite', descricao:'Ir ao supermercado', prioridade:2, concluida:false },
-    { id:2, titulo:'Estudar Angular', descricao:'Revisar SPA', prioridade:1, concluida:false }
+    { id:1, titulo:'Comprar leite', descricao:'Ir ao supermercado', prioridade:2, concluida:false, categoriaId: 1 },
+    { id:2, titulo:'Estudar Angular', descricao:'Revisar SPA', prioridade:1, concluida:false, categoriaId: 2 }
   ];
 
   listar(): Observable<Tarefas[]> {

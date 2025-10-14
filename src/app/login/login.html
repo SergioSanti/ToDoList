@@ -1,18 +1,54 @@
-<div class="container login-container">
-    <h3>Login</h3>
-    <div class="form-group">
-        <input type="text" [(ngModel)]= "usuario" class="form-control textfield" placeholder="Digite seu usuário" value="" />
-    </div>
-    <div class="form-group">
-        <input type="password" [(ngModel)]= "senha" class="form-control textfield" placeholder="Digite sua senha" value="" />
-    </div>
-    <div class="form-group">
-        <button (click)="realizarLogin()" class="btnSubmit">Login</button>
-    </div>
-    @if(erro()) {
-        <p class="text-danger">Usuário ou Senha Inválidos</p>
-    }
-    <div class="form-group">
-        <a href="#" class="ForgetPwd">Forget Password?</a>
-    </div>
+<div class="container py-5">
+  <main class="form-signin w-100 m-auto shadow-lg rounded-4 p-5 bg-body">
+    <form (ngSubmit)="realizarLogin()">
+      <div class="text-center mb-4">
+
+        <h1 class="h4 mb-3 fw-normal">Acesse sua conta</h1>
+        <p class="text-body-secondary">Use seu usuário e senha para entrar</p>
+      </div>
+
+      <div class="form-floating mb-3">
+        <input
+          type="text"
+          id="usuario"
+          class="form-control"
+          placeholder="Usuário"
+          [(ngModel)]="usuario"
+          name="usuario"
+          required
+        />
+        <label for="usuario">Usuário</label>
+      </div>
+
+      <div class="form-floating mb-3">
+        <input
+          type="password"
+          id="senha"
+          class="form-control"
+          placeholder="Senha"
+          [(ngModel)]="senha"
+          name="senha"
+          required
+        />
+        <label for="senha">Senha</label>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary w-100 py-2 fw-semibold rounded-3"
+      >
+        Entrar
+      </button>
+
+      <div *ngIf="erro()" class="mt-3 text-danger text-center">
+        Usuário ou senha inválidos.
+      </div>
+
+      <p class="mt-4 mb-0 text-center">
+        <a href="#" class="text-decoration-none text-secondary">
+          Esqueceu a senha?
+        </a>
+      </p>
+    </form>
+  </main>
 </div>

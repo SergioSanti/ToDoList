@@ -1,11 +1,21 @@
-<div class="card shadow">
-  <div class="card-header">
-    <img src="/imagem.png" alt="tarefa" class="card-img-top">
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">{{ tarefa.titulo }}</h5>
-    <p class="card-text">{{ tarefa.descricao }}</p>
-    <p class="card-text"><strong>Prioridade:</strong> {{ tarefa.prioridade }}</p>
-    <p class="card-text"><strong>Concluída:</strong> {{ tarefa.concluida ? 'Sim' : 'Não' }}</p>
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Lista de Tarefas</h2>
+
+  <div class="row gy-3">
+    @for (tarefa of tarefas(); track tarefa.id) {
+      <div class="col-md-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title">{{ tarefa.titulo }}</h5>
+            <p class="card-text">{{ tarefa.descricao }}</p>
+            <p class="card-text"><strong>Categoria:</strong> {{ getCategoriaNome(tarefa.categoriaId) }}</p>
+            <p class="card-text"><strong>Prioridade:</strong> {{ tarefa.prioridade }}</p>
+            <p class="card-text"><strong>Concluída:</strong> {{ tarefa.concluida ? 'Sim' : 'Não' }}</p>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <p class="text-center text-muted">Nenhuma tarefa cadastrada.</p>
+    }
   </div>
 </div>

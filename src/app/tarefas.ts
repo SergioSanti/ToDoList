@@ -4,4 +4,5 @@ export interface Tarefas {
   descricao: string;
   prioridade: number;
   concluida: boolean;
+  categoriaId: number;
 }

@@ -1,25 +1,126 @@
+/* Importa o Bootstrap */
 @import "../node_modules/bootstrap/dist/css/bootstrap.css";
 
-/* Estilos globais */
+/* ---------- ESTILO GLOBAL MODERNO ---------- */
+
+/* Corpo geral */
 body {
-  background-color: #f8f9fa; /* cinza claro */
-  font-family: "Segoe UI", Roboto, sans-serif;
+  background-color: #f8f9fa;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #212529;
+  padding: 20px;
 }
 
+/* Cabeçalhos */
 h1, h2, h3, h4, h5 {
-  color: #C0392B; /* vermelho cinema */
+  font-weight: 600;
+  color: #343a40;
 }
 
+/* Container padrão centralizado */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Cartões */
+.card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Botões */
 .btn-primary {
-  background-color: #C0392B;
+  background-color: #712cf9;
+  border: none;
+}
+.btn-primary:hover {
+  background-color: #5a23c8;
+}
+.btn-secondary {
+  background-color: #6c757d;
   border: none;
 }
 
-.btn-primary:hover {
-  background-color: #a93226;
+/* Formulários */
+.form-control, .form-select {
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  box-shadow: none;
+}
+.form-control:focus, .form-select:focus {
+  border-color: #712cf9;
+  box-shadow: 0 0 0 0.15rem rgba(112, 44, 249, 0.25);
 }
 
-.table-primary {
-  background-color: #D4AC0D !important;
+/* Navbar ou topo genérico */
+header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+/* Rodapé */
+footer {
+  text-align: center;
+  color: #6c757d;
+  padding: 20px;
+  margin-top: 40px;
+  border-top: 1px solid #dee2e6;
+}
+
+/* ---------- AJUSTE DE LAYOUT RESPONSIVO ---------- */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+  .container {
+    padding: 0 10px;
+  }
+}
+
+/* Navbar estilizada globalmente */
+.navbar {
+  background-color: #007bff; /* azul principal */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* sombra sutil */
+}
+
+.navbar-nav {
+  justify-content: center; /* centraliza os itens */
+  width: 100%;
+  display: flex;
+}
+
+.navbar-nav .nav-item {
+  margin: 0 1rem; /* espaço entre os itens */
+}
+
+.navbar-nav .nav-link {
+  font-size: 1.3rem;       /* tamanho maior */
+  font-weight: 600;         /* negrito */
+  padding: 0.7rem 1.5rem;  /* mais espaçamento */
+  border-radius: 0.5rem;   /* cantos arredondados */
+  transition: background-color 0.3s, transform 0.2s;
+  color: #fff;              /* garante cor branca */
+}
+
+.navbar-nav .nav-link:hover {
+  background-color: #0056b3; /* mais escura ao passar o mouse */
+  transform: scale(1.05);    /* leve aumento */
+  color: #fff;
+}
+
+/* Para marcar a selecionada */
+.navbar-nav .nav-link.active {
+  background-color: #003f7f; /* cor mais escura da ativa */
   color: #fff;
 }
