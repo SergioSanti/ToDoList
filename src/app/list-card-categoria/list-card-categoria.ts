@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CategoriaService } from '../categoria-service';
+import { CategoriaApiService } from '../categoria-api-service';
 import { Categoria } from '../categoria';
 
 @Component({
@@ -12,10 +12,12 @@ import { Categoria } from '../categoria';
 })
 export class ListCardCategoria {
   categorias = signal<Categoria[]>([]);
-  private categoriaService = inject(CategoriaService);
+  private categoriaApiService = inject(CategoriaApiService);
 
   constructor() {
-    this.categorias.set(this.categoriaService.listar());
+    this.categoriaApiService.listar().subscribe((categorias) => {
+      this.categorias.set(categorias);
+    });
   }
 
   getContrastColor(hexColor: string): string {
