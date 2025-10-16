@@ -1,14 +1,17 @@
 <div class="container mt-4">
   <h2 class="mb-4 text-center">Lista Completa de Tarefas</h2>
 
+  <!-- FUNCIONALIDADE DE NEGÓCIO: Exibição integrada com relacionamento -->
   <div class="row gy-3">
     @for (tarefa of tarefas(); track tarefa.id) {
       <div class="col-md-4">
+        <!-- RELACIONAMENTO: Card com cor da categoria -->
         <div class="card shadow" [style.border-left]="'5px solid ' + getCategoriaCor(tarefa.categoriaId)">
           <div class="card-body">
             <h5 class="card-title">{{ tarefa.titulo }}</h5>
             <p class="card-text">{{ tarefa.descricao }}</p>
             
+            <!-- RELACIONAMENTO: Exibe categoria com cor personalizada -->
             <div class="mb-2">
               <strong>Categoria:</strong> 
               <span class="badge" [style.background-color]="getCategoriaCor(tarefa.categoriaId)" [style.color]="getContrastColor(getCategoriaCor(tarefa.categoriaId))">
@@ -16,6 +19,7 @@
               </span>
             </div>
             
+            <!-- FUNCIONALIDADE DE NEGÓCIO: Badges com cores baseadas em prioridade -->
             <div class="row">
               <div class="col-6">
                 <p class="card-text mb-1">

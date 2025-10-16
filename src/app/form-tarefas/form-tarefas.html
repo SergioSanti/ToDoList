@@ -1,6 +1,7 @@
 <div class="container">
   <h2>Formulário de Tarefas</h2>
   <div>
+    <!-- CRUD: Campos para criação/edição de tarefas -->
     <div class="mb-3">
       <label for="titulo" class="form-label">Título:</label>
       <input type="text" [(ngModel)]="tarefas().titulo" id="titulo" class="form-control" placeholder="Digite o título">
@@ -11,11 +12,13 @@
       <input type="text" [(ngModel)]="tarefas().descricao" id="descricao" class="form-control" placeholder="Descrição">
     </div>
 
+    <!-- RELACIONAMENTO: Select que conecta Tarefas com Categorias -->
+    <!-- FUNCIONALIDADE: Manipulação de duas entidades simultaneamente -->
     <div class="mb-3">
       <label for="categoria" class="form-label">Categoria:</label>
       <select [(ngModel)]="tarefas().categoriaId" id="categoria" class="form-control">
         @for(categoria of categorias(); track categoria.id) {
-          <option [value]="categoria.id">{{categoria.nome}}</option>
+          <option [value]="categoria.id.toString()">{{categoria.nome}}</option>
         }
       </select>
     </div>
@@ -31,7 +34,9 @@
       </label>
     </div>
 
+    <!-- CRUD: Botões para salvar (Create/Update) -->
     <button class="btn btn-primary me-3" (click)="salvar()">{{botaoAcao}}</button>
+    <!-- NAVEGAÇÃO SPA: Botão para voltar -->
     <button class="btn btn-secondary" (click)="voltar()">Voltar</button>
   </div>
 </div>
