@@ -5,17 +5,17 @@
  * - Campos básicos da tarefa
  * - Relacionamento com entidade Categoria
  * - Campos de controle e prioridade
+ * - Soft delete para rastreamento de exclusões
  * 
- * FUNCIONALIDADES IMPLEMENTADAS:
- * ✅ Entidade principal do sistema
- * ✅ Relacionamento com entidade Categoria (categoriaId)
- * ✅ Campos para funcionalidades de negócio
  */
 export interface Tarefas {
   id: number;                    // Identificador único
-  titulo: string;                // Título da tarefa
-  descricao: string;             // Descrição detalhada
+  titulo: string;                // Título da tarefa (obrigatório)
+  descricao: string;             // Descrição detalhada (obrigatório)
   prioridade: number;            // Prioridade (1-5)
   concluida: boolean;           // Status de conclusão
-  categoriaId: number;          // RELACIONAMENTO: ID da categoria
+  categoriaId: number;          // RELACIONAMENTO: ID da categoria (obrigatório)
+  excluida?: boolean;           // Soft delete - marca tarefa como excluída
+  created_at?: string;          // Data de criação (Supabase)
+  updated_at?: string;          // Data de atualização (Supabase)
 }

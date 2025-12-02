@@ -1,0 +1,174 @@
+<div class="container-fluid mt-4">
+  <h1 class="text-center mb-4">Dashboard de Tarefas</h1>
+
+  <!-- Cards de Estatísticas -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card text-white bg-primary">
+        <div class="card-body">
+          <h5 class="card-title">Total de Tarefas</h5>
+          <h2 class="card-text">{{totalTarefas()}}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-white bg-success">
+        <div class="card-body">
+          <h5 class="card-title">Tarefas Ativas</h5>
+          <h2 class="card-text">{{totalAtivas()}}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-white bg-danger">
+        <div class="card-body">
+          <h5 class="card-title">Tarefas Excluídas</h5>
+          <h2 class="card-text">{{totalExcluidas()}}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-white bg-info">
+        <div class="card-body">
+          <h5 class="card-title">Concluídas</h5>
+          <h2 class="card-text">{{totalConcluidas()}} / {{totalPendentes()}}</h2>
+          <small>Concluídas / Pendentes</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarefas Ativas em Cards -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">Tarefas Ativas ({{totalAtivas()}})</h4>
+        </div>
+        <div class="card-body">
+          @if (tarefasAtivas().length === 0) {
+            <p class="text-muted text-center">Nenhuma tarefa ativa encontrada.</p>
+          } @else {
+            <div class="row gy-3">
+              @for (tarefa of tarefasAtivas(); track tarefa.id) {
+                <div class="col-md-4">
+                  <div class="card shadow h-100" [style.border-left]="'5px solid ' + getCategoriaCor(tarefa.categoriaId)">
+                    <div class="card-body">
+                      <h5 class="card-title">{{ tarefa.titulo }}</h5>
+                      <p class="card-text">{{ tarefa.descricao }}</p>
+                      
+                      <!-- Categoria com cor personalizada -->
+                      <div class="mb-2">
+                        <strong>Categoria:</strong> 
+                        <span class="badge" [style.background-color]="getCategoriaCor(tarefa.categoriaId)" [style.color]="getContrastColor(getCategoriaCor(tarefa.categoriaId))">
+                          {{ getCategoriaNome(tarefa.categoriaId) }}
+                        </span>
+                      </div>
+                      
+                      <!-- Prioridade e Status -->
+                      <div class="row">
+                        <div class="col-6">
+                          <p class="card-text mb-1">
+                            <strong>Prioridade:</strong> 
+                            <span class="badge" [ngClass]="{
+                              'bg-danger': tarefa.prioridade >= 4,
+                              'bg-warning': tarefa.prioridade === 3,
+                              'bg-info': tarefa.prioridade === 2,
+                              'bg-success': tarefa.prioridade === 1
+                            }">
+                              {{ tarefa.prioridade }}
+                            </span>
+                          </p>
+                        </div>
+                        <div class="col-6">
+                          <p class="card-text mb-1">
+                            <strong>Status:</strong> 
+                            <span class="badge" [ngClass]="tarefa.concluida ? 'bg-success' : 'bg-secondary'">
+                              {{ tarefa.concluida ? 'Concluída' : 'Pendente' }}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarefas Excluídas em Cards -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-danger text-white">
+          <h4 class="mb-0">Tarefas Excluídas ({{totalExcluidas()}})</h4>
+        </div>
+        <div class="card-body">
+          @if (tarefasExcluidas().length === 0) {
+            <p class="text-muted text-center">Nenhuma tarefa excluída encontrada.</p>
+          } @else {
+            <div class="row gy-3">
+              @for (tarefa of tarefasExcluidas(); track tarefa.id) {
+                <div class="col-md-4">
+                  <div class="card shadow h-100 opacity-75" [style.border-left]="'5px solid ' + getCategoriaCor(tarefa.categoriaId)">
+                    <div class="card-body">
+                      <h5 class="card-title"><del>{{ tarefa.titulo }}</del></h5>
+                      <p class="card-text"><del>{{ tarefa.descricao }}</del></p>
+                      
+                      <!-- Categoria com cor personalizada -->
+                      <div class="mb-2">
+                        <strong>Categoria:</strong> 
+                        <span class="badge" [style.background-color]="getCategoriaCor(tarefa.categoriaId)" [style.color]="getContrastColor(getCategoriaCor(tarefa.categoriaId))">
+                          {{ getCategoriaNome(tarefa.categoriaId) }}
+                        </span>
+                      </div>
+                      
+                      <!-- Prioridade e Status -->
+                      <div class="row mb-2">
+                        <div class="col-6">
+                          <p class="card-text mb-1">
+                            <strong>Prioridade:</strong> 
+                            <span class="badge" [ngClass]="{
+                              'bg-danger': tarefa.prioridade >= 4,
+                              'bg-warning': tarefa.prioridade === 3,
+                              'bg-info': tarefa.prioridade === 2,
+                              'bg-success': tarefa.prioridade === 1
+                            }">
+                              {{ tarefa.prioridade }}
+                            </span>
+                          </p>
+                        </div>
+                        <div class="col-6">
+                          <p class="card-text mb-1">
+                            <strong>Status:</strong> 
+                            <span class="badge" [ngClass]="tarefa.concluida ? 'bg-success' : 'bg-secondary'">
+                              {{ tarefa.concluida ? 'Concluída' : 'Pendente' }}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <!-- Botão Restaurar -->
+                      <div class="mt-auto">
+                        <button 
+                          class="btn btn-sm btn-success w-100" 
+                          (click)="restaurarTarefa(tarefa.id)">
+                          Restaurar Tarefa
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

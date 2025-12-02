@@ -1,15 +1,18 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth-service';
 import { inject } from '@angular/core';
+import { getSupabaseClient } from '../supabase-client';
 
-
-export const authGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
+export const authGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
-  if(authService.estaLogado()) {
+  const supabase = getSupabaseClient();
+  
+  // Verifica a sessão de forma assíncrona
+  const { data: { session }, error } = await supabase.auth.getSession();
+  
+  if (session && !error) {
     return true;
-  }
-  else {
+  } else {
     router.navigate(['/login']);
     return false;
   }

@@ -14,13 +14,6 @@ import { Categoria } from '../categoria';
  * - Funcionalidade de negócio: exibição integrada
  * - Manipulação de duas entidades simultaneamente
  * - Cálculo de cores de contraste
- * 
- * FUNCIONALIDADES IMPLEMENTADAS:
- * ✅ Relacionamento entre duas entidades (Tarefas ↔ Categorias)
- * ✅ Funcionalidade de negócio: exibição integrada com cores
- * ✅ Manipulação de duas entidades simultaneamente
- * ✅ Cálculo automático de cores de contraste
- * ✅ Exibição visual com badges e cores das categorias
  */
 @Component({
   selector: 'app-list-card-tarefas',

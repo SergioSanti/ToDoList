@@ -1,30 +1,59 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { from, map, Observable } from 'rxjs';
+import { getSupabaseClient } from '../supabase-client';
 
+/**
+ * SERVIÇO DE AUTENTICAÇÃO COM SUPABASE AUTH
+ *
+ * Responsável por:
+ * - Login com e-mail e senha (Serverless Authentication)
+ * - Manter sessão autenticada (persistSession: true)
+ * - Verificar se usuário está logado
+ * - Logout
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  login(username: string, senha: string): Observable<boolean> {
-    // Aqui simulamos um backend com dois logins válidos:
-    if (
-      (username === 'admin' && senha === '1234') ||
-      (username === 'teste' && senha === 'senha')
-    ) {
-      localStorage.setItem('token', 'fake-jwt-token');
-      return of(true);
-    } else {
-      return of(false);
-    }
+  /**
+   * LOGIN - Utiliza Supabase Authentication (email/senha)
+   */
+  login(email: string, senha: string): Observable<boolean> {
+    const supabase = getSupabaseClient();
+
+    return from(
+      supabase.auth.signInWithPassword({
+        email,
+        password: senha
+      })
+    ).pipe(
+      map(result => {
+        return !result.error && !!result.data.session;
+      })
+    );
   }
 
+  /**
+   * VERIFICAÇÃO DE LOGIN
+   * Usa a sessão mantida pelo Supabase.
+   */
   estaLogado(): boolean {
-    const token = localStorage.getItem('token');
-    return token === 'fake-jwt-token';
+    const supabase = getSupabaseClient();
+    const session = supabase.auth.getSession();
+    // getSession() retorna uma Promise, então aqui fazemos uma verificação simples
+    // baseada em storage interno do Supabase (persistSession).
+    // Para o RouteGuard (sincrono), usamos a existência do item no localStorage.
+    const hasSupabaseAuthStorage = !!localStorage.getItem('sb-' /* prefixo padrão */);
+    return hasSupabaseAuthStorage;
   }
 
+  /**
+   * LOGOUT - Encerra sessão no Supabase e limpa dados locais
+   */
   logout(): void {
-    localStorage.removeItem('token');
+    const supabase = getSupabaseClient();
+    supabase.auth.signOut();
   }
 }
+

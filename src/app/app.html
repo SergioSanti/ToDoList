@@ -1,28 +1,53 @@
-<h1 class="text-center mt-3">Sistema de Tarefas e Categorias</h1>
+<!-- Título do Sistema -->
+<div class="system-header">
+    <h1 class="system-title">TaskMaster</h1>
+</div>
 
-<!-- NAVEGAÇÃO SPA: Barra de navegação com RouterLink -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<!-- Botão de Logout Fixo (Canto Superior Direito) -->
+<button class="btn btn-logout-fixed" (click)="logout()" type="button" title="Sair">
+    <span class="logout-icon-fixed">×</span>
+</button>
+
+<!-- NAVEGAÇÃO SPA: Barra de navegação centralizada -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary custom-navbar">
     <div class="container-fluid">
-        <ul class="navbar-nav">
-            <!-- NAVEGAÇÃO SPA: Links para diferentes telas -->
-            <li class="nav-item">
-                <a class="nav-link" routerLink="/lista">Lista Completa</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" routerLink="/tabela">Tarefas - Tabela</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" routerLink="/novo">Tarefas - Cadastro</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" routerLink="/tabela-categoria">Categorias - Tabela</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" routerLink="/novo-categoria">Categorias - Cadastro</a>
-            </li>
-        </ul>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <!-- NAVEGAÇÃO SPA: Links para diferentes telas -->
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/tabela" routerLinkActive="active">
+                        Tarefas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/novo" routerLinkActive="active">
+                        Nova Tarefa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/tabela-categoria" routerLinkActive="active">
+                        Categorias
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/novo-categoria" routerLinkActive="active">
+                        Nova Categoria
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
 <!-- NAVEGAÇÃO SPA: RouterOutlet renderiza componentes das rotas -->
 <router-outlet />
+
+

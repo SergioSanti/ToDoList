@@ -1,37 +1,92 @@
-<div class="container">
+<div class="container mt-4">
   <h2>Formulário de Tarefas</h2>
   <div>
     <!-- CRUD: Campos para criação/edição de tarefas -->
+    <!-- VALIDAÇÃO: Campos obrigatórios com feedback visual -->
     <div class="mb-3">
-      <label for="titulo" class="form-label">Título:</label>
-      <input type="text" [(ngModel)]="tarefas().titulo" id="titulo" class="form-control" placeholder="Digite o título">
+      <label for="titulo" class="form-label">Título: <span class="text-danger">*</span></label>
+      <input 
+        type="text" 
+        [(ngModel)]="tarefas().titulo" 
+        id="titulo" 
+        name="titulo"
+        class="form-control" 
+        [class.is-invalid]="erros()['titulo']"
+        placeholder="Digite o título"
+        required>
+      @if (erros()['titulo']) {
+        <div class="invalid-feedback">{{erros()['titulo']}}</div>
+      }
     </div>
 
     <div class="mb-3">
-      <label for="descricao" class="form-label">Descrição:</label>
-      <input type="text" [(ngModel)]="tarefas().descricao" id="descricao" class="form-control" placeholder="Descrição">
+      <label for="descricao" class="form-label">Descrição: <span class="text-danger">*</span></label>
+      <textarea 
+        [(ngModel)]="tarefas().descricao" 
+        id="descricao" 
+        name="descricao"
+        class="form-control" 
+        [class.is-invalid]="erros()['descricao']"
+        placeholder="Digite a descrição"
+        rows="3"
+        required></textarea>
+      @if (erros()['descricao']) {
+        <div class="invalid-feedback">{{erros()['descricao']}}</div>
+      }
     </div>
 
     <!-- RELACIONAMENTO: Select que conecta Tarefas com Categorias -->
     <!-- FUNCIONALIDADE: Manipulação de duas entidades simultaneamente -->
     <div class="mb-3">
-      <label for="categoria" class="form-label">Categoria:</label>
-      <select [(ngModel)]="tarefas().categoriaId" id="categoria" class="form-control">
+      <label for="categoria" class="form-label">Categoria: <span class="text-danger">*</span></label>
+      <select 
+        [(ngModel)]="tarefas().categoriaId" 
+        id="categoria" 
+        name="categoria"
+        class="form-control"
+        [class.is-invalid]="erros()['categoria']"
+        required>
+        <option value="">Selecione uma categoria</option>
         @for(categoria of categorias(); track categoria.id) {
           <option [value]="categoria.id.toString()">{{categoria.nome}}</option>
         }
       </select>
+      @if (erros()['categoria']) {
+        <div class="invalid-feedback">{{erros()['categoria']}}</div>
+      }
     </div>
 
     <div class="mb-3">
-      <label for="prioridade" class="form-label">Prioridade:</label>
-      <input type="number" [(ngModel)]="tarefas().prioridade" id="prioridade" class="form-control" placeholder="1-5">
+      <label for="prioridade" class="form-label">Prioridade (1-5): <span class="text-danger">*</span></label>
+      <input 
+        type="number" 
+        [(ngModel)]="tarefas().prioridade" 
+        id="prioridade" 
+        name="prioridade"
+        class="form-control" 
+        [class.is-invalid]="erros()['prioridade']"
+        min="1" 
+        max="5"
+        placeholder="1-5"
+        required>
+      @if (erros()['prioridade']) {
+        <div class="invalid-feedback">{{erros()['prioridade']}}</div>
+      }
+      <small class="form-text text-muted">Digite um valor entre 1 (menor) e 5 (maior prioridade)</small>
     </div>
 
     <div class="mb-3">
-      <label>
-        <input type="checkbox" [(ngModel)]="tarefas().concluida"> Concluída
-      </label>
+      <div class="form-check">
+        <input 
+          type="checkbox" 
+          [(ngModel)]="tarefas().concluida" 
+          id="concluida"
+          name="concluida"
+          class="form-check-input">
+        <label class="form-check-label" for="concluida">
+          Concluída
+        </label>
+      </div>
     </div>
 
     <!-- CRUD: Botões para salvar (Create/Update) -->

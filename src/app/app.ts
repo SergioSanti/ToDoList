@@ -10,13 +10,6 @@ import { AuthService } from './auth/auth-service';
  * - Navegação entre telas com RouterLink
  * - Sistema de logout com limpeza de token
  * - Integração com sistema de autenticação
- * 
- * FUNCIONALIDADES IMPLEMENTADAS:
- * ✅ Navegação SPA entre múltiplas telas
- * ✅ Login e tratamento de segurança com Token (JWT)
- * ✅ Sistema de logout com limpeza de localStorage
- * ✅ Integração com AuthService
- * ✅ RouterOutlet para renderização de componentes
  */
 @Component({
   selector: 'app-root',

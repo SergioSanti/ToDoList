@@ -1,117 +1,116 @@
 import { Injectable } from '@angular/core';
-import { of, Observable } from 'rxjs';
+import { from, map, Observable } from 'rxjs';
 import { Categoria } from './categoria';
+import { getSupabaseClient } from './supabase-client';
 
 /**
- * SERVIÇO DE CATEGORIAS - CRUD COMPLETO
- * 
- * Este serviço implementa todas as operações CRUD para a entidade Categoria:
- * - CREATE: inserir() - Cria nova categoria
- * - READ: listar() e buscarPorId() - Lista todas ou busca por ID
- * - UPDATE: editar() - Atualiza categoria existente
- * - DELETE: deletar() - Remove categoria
- * 
- * FUNCIONALIDADES IMPLEMENTADAS:
- * ✅ CRUD completo com localStorage
- * ✅ Persistência de dados entre sessões
- * ✅ Geração automática de IDs únicos
- * ✅ Relacionamento com entidade Tarefas (usado por categoriaId)
+ * SERVIÇO DE CATEGORIAS - CRUD COMPLETO COM SUPABASE DATABASE
+ *
+ * Tabela sugerida no Supabase: "categorias"
+ * Campos: id (PK), nome, descricao, cor
  */
 @Injectable({ providedIn: 'root' })
 export class CategoriaApiService {
-  // Array estático compartilhado entre todas as instâncias do serviço
-  private static categorias: Categoria[] = [];
-
-  constructor() {
-    CategoriaApiService.carregarDados();
-  }
-
-  /**
-   * Carrega dados do localStorage ou cria dados padrão
-   * FUNCIONALIDADE: Persistência de dados
-   */
-  private static carregarDados() {
-    const dados = localStorage.getItem('categorias');
-    if (dados) {
-      CategoriaApiService.categorias = JSON.parse(dados);
-    } else {
-      // Dados padrão que serão referenciados pelas tarefas
-      CategoriaApiService.categorias = [
-        { id:1, nome:'Trabalho', descricao:'Tarefas relacionadas ao trabalho', cor:'#007bff' },
-        { id:2, nome:'Pessoal', descricao:'Tarefas pessoais', cor:'#28a745' }
-      ];
-      localStorage.setItem('categorias', JSON.stringify(CategoriaApiService.categorias));
-    }
-  }
-
-  /**
-   * Salva dados no localStorage
-   * FUNCIONALIDADE: Persistência automática
-   */
-  private static salvarDados() {
-    localStorage.setItem('categorias', JSON.stringify(CategoriaApiService.categorias));
-  }
 
   /**
    * READ - Lista todas as categorias
-   * CRUD: Operação de Leitura
    */
   listar(): Observable<Categoria[]> {
-    return of([...CategoriaApiService.categorias]);
+    const supabase = getSupabaseClient();
+    return from(
+      supabase
+        .from('categorias')
+        .select('*')
+        .order('id', { ascending: true })
+    ).pipe(
+      map(result => (result.data || []) as Categoria[])
+    );
   }
 
   /**
    * READ - Busca categoria por ID
-   * CRUD: Operação de Leitura específica
-   * RELACIONAMENTO: Usado para buscar categoria de uma tarefa
    */
   buscarPorId(id?: number): Observable<Categoria> {
-    const categoria = CategoriaApiService.categorias.find(c => c.id === id);
-    if (categoria) {
-      return of({...categoria});
+    const supabase = getSupabaseClient();
+    if (!id) {
+      return from(Promise.resolve({
+        id: 0,
+        nome: '',
+        descricao: '',
+        cor: '#007bff'
+      } as Categoria));
     }
-    return of({ id: 0, nome: '', descricao: '', cor: '#007bff' });
+
+    return from(
+      supabase
+        .from('categorias')
+        .select('*')
+        .eq('id', id)
+        .single()
+    ).pipe(
+      map(result => result.data as Categoria)
+    );
   }
 
   /**
    * CREATE - Insere nova categoria
-   * CRUD: Operação de Criação
-   * FUNCIONALIDADE: Geração automática de ID único
    */
   inserir(categoria: Categoria): Observable<Categoria> {
-    const maxId = CategoriaApiService.categorias.length > 0 ? Math.max(...CategoriaApiService.categorias.map(c => c.id)) : 0;
-    categoria.id = maxId + 1;
-    CategoriaApiService.categorias.push(categoria);
-    CategoriaApiService.salvarDados();
-    return of(categoria);
+    const supabase = getSupabaseClient();
+    const payload: any = {
+      nome: categoria.nome,
+      descricao: categoria.descricao,
+      cor: categoria.cor
+    };
+
+    return from(
+      supabase
+        .from('categorias')
+        .insert(payload)
+        .select('*')
+        .single()
+    ).pipe(
+      map(result => result.data as Categoria)
+    );
   }
 
   /**
    * UPDATE - Edita categoria existente
-   * CRUD: Operação de Atualização
-   * RELACIONAMENTO: Afeta todas as tarefas que usam esta categoria
    */
   editar(id: number, categoria: Categoria): Observable<Categoria> {
-    const index = CategoriaApiService.categorias.findIndex(c => c.id === id);
-    if (index >= 0) {
-      categoria.id = id;
-      CategoriaApiService.categorias[index] = categoria;
-      CategoriaApiService.salvarDados();
-      return of(categoria);
-    }
-    return of(categoria);
+    const supabase = getSupabaseClient();
+    const payload: any = {
+      nome: categoria.nome,
+      descricao: categoria.descricao,
+      cor: categoria.cor
+    };
+
+    return from(
+      supabase
+        .from('categorias')
+        .update(payload)
+        .eq('id', id)
+        .select('*')
+        .single()
+    ).pipe(
+      map(result => result.data as Categoria)
+    );
   }
 
   /**
    * DELETE - Remove categoria
-   * CRUD: Operação de Exclusão
-   * RELACIONAMENTO: Pode afetar tarefas que referenciam esta categoria
    */
   deletar(id?: number): Observable<Categoria> {
-    const index = CategoriaApiService.categorias.findIndex(c => c.id === id);
-    const categoria = CategoriaApiService.categorias[index];
-    CategoriaApiService.categorias.splice(index, 1);
-    CategoriaApiService.salvarDados();
-    return of(categoria);
+    const supabase = getSupabaseClient();
+    return from(
+      supabase
+        .from('categorias')
+        .delete()
+        .eq('id', id as number)
+        .select('*')
+        .single()
+    ).pipe(
+      map(result => result.data as Categoria)
+    );
   }
 }

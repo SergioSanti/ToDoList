@@ -9,11 +9,6 @@ import { Tarefas } from './tarefas';
  * - Busca case-insensitive (ignora maiúsculas/minúsculas)
  * - Retorna todas as tarefas se não houver texto de busca
  * 
- * FUNCIONALIDADES IMPLEMENTADAS:
- * ✅ Funcionalidade de filtro/busca
- * ✅ Uso de Pipes do Angular
- * ✅ Transformação de dados em tempo real
- * ✅ Integração com ngModel para busca dinâmica
  */
 @Pipe({name: 'filtroPesquisa'})
 export class FiltroPesquisaPipe implements PipeTransform {

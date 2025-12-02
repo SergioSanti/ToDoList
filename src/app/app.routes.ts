@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { Dashboard } from './dashboard/dashboard';
 import { TabelaTarefas } from './tabela-tarefas/tabela-tarefas';
 import { FormTarefas } from './form-tarefas/form-tarefas';
 import { ListCardTarefas } from './list-card-tarefas/list-card-tarefas';
@@ -19,18 +20,15 @@ import { authGuard } from './auth/auth-guard-guard';
  * - Redirecionamentos
  * - Página 404
  * 
- * FUNCIONALIDADES IMPLEMENTADAS:
- * ✅ Navegação SPA entre múltiplas telas
- * ✅ Login e tratamento de segurança com Token (JWT)
- * ✅ Proteção de rotas utilizando RouteGuard
- * ✅ Rotas com parâmetros dinâmicos
- * ✅ Redirecionamentos automáticos
  */
 export const routes: Routes = [
   // ROTA PÚBLICA: Login (sem proteção)
   { path: 'login', component: Login },
 
   // ROTAS PROTEGIDAS COM AUTHGUARD - SEGURANÇA COM TOKEN
+  // Dashboard - Página Principal
+  { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
+  
   // CRUD de Tarefas
   { path: 'tabela', component: TabelaTarefas, canActivate: [authGuard] },
   { path: 'novo', component: FormTarefas, canActivate: [authGuard] },
@@ -43,8 +41,8 @@ export const routes: Routes = [
   { path: 'lista-categoria', component: ListCardCategoria, canActivate: [authGuard] },
   { path: 'edit-categoria/:id', component: FormCategoria, canActivate: [authGuard] }, // Parâmetro dinâmico
 
-  // REDIRECIONAMENTO: Rota raiz vai para tabela
-  { path: '', redirectTo: '/tabela', pathMatch: 'full' },
+  // REDIRECIONAMENTO: Rota raiz vai para dashboard
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
 
   // PÁGINA 404: Qualquer rota não encontrada
   { path: '**', component: PageNotFound }

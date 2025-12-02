@@ -19,12 +19,6 @@ import { filter } from 'rxjs/operators';
  * - Operações CRUD (Editar/Deletar)
  * - Navegação SPA entre telas
  * 
- * FUNCIONALIDADES IMPLEMENTADAS:
- * ✅ CRUD: Visualização, Edição e Exclusão
- * ✅ Funcionalidade de busca com Pipes
- * ✅ Relacionamento entre duas entidades (Tarefas ↔ Categorias)
- * ✅ Navegação SPA com RouterLink
- * ✅ Recarregamento automático de dados
  */
 @Component({
   selector: 'app-tabela-tarefas',

@@ -1,0 +1,39 @@
+.card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.card-header {
+  font-weight: bold;
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+  font-size: 0.875rem;
+}
+
+/* Cards de tarefas */
+.card.shadow {
+  transition: all 0.3s ease;
+}
+
+.card.shadow:hover {
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2) !important;
+}
+
+/* Cards excluídos com opacidade */
+.opacity-75 {
+  opacity: 0.75;
+}
+
+/* Altura igual para cards na mesma linha */
+.h-100 {
+  height: 100%;
+}
+

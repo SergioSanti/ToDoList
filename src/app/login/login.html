@@ -40,9 +40,11 @@
         Entrar
       </button>
 
-      <div *ngIf="erro()" class="mt-3 text-danger text-center">
-        Usuário ou senha inválidos.
-      </div>
+      @if (erro()) {
+        <div class="mt-3 alert alert-danger" role="alert">
+          {{erro()}}
+        </div>
+      }
 
       <p class="mt-4 mb-0 text-center">
         <a href="#" class="text-decoration-none text-secondary">
