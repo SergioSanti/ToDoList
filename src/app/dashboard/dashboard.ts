@@ -27,7 +27,7 @@ import { Category } from '../category';
 export class Dashboard implements OnInit {
   // Signals for reactive data
   allTasks = signal<Task[]>([]);
-  activeTasks = signal<Task[]>([]);
+  activeTasks = signal<Task[]>([]); // Apenas tarefas ativas e NÃO concluídas
   completedTasks = signal<Task[]>([]);
   deletedTasks = signal<Task[]>([]);
   categories = signal<Category[]>([]);
@@ -62,8 +62,8 @@ export class Dashboard implements OnInit {
       this.allTasks.set(tasks);
       
       // Separate tasks by status
-      const active = tasks.filter(t => !t.deleted);
-      const completed = active.filter(t => t.completed);
+      const active = tasks.filter(t => !t.deleted && !t.completed); // Apenas não deletadas E não concluídas
+      const completed = tasks.filter(t => !t.deleted && t.completed); // Não deletadas E concluídas
       const deleted = tasks.filter(t => t.deleted);
       
       this.activeTasks.set(active);
@@ -75,7 +75,7 @@ export class Dashboard implements OnInit {
       this.totalActive.set(active.length);
       this.totalCompleted.set(completed.length);
       this.totalDeleted.set(deleted.length);
-      this.totalPending.set(active.filter(t => !t.completed).length);
+      this.totalPending.set(active.length); // Pendentes = ativas (já que ativas = não concluídas)
     });
 
     // Load categories for relationship
@@ -101,6 +101,22 @@ export class Dashboard implements OnInit {
         this.isLoadingStats.set(false);
         // Continue without Edge Function stats if it fails
       }
+    });
+  }
+
+  /**
+   * Toggle task completion status
+   * Quick action to mark task as complete/incomplete
+   */
+  toggleComplete(task: Task) {
+    const updatedTask: Task = {
+      ...task,
+      completed: !task.completed
+    };
+    
+    this.tasksApiService.update(task.id, updatedTask).subscribe(() => {
+      this.loadData(); // Recarrega os dados
+      this.loadEdgeFunctionStats(); // Reload Edge Function stats
     });
   }
 

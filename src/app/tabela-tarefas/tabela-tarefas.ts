@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
@@ -6,7 +6,6 @@ import { TasksApiService } from '../tasks-api-service';
 import { CategoriesApiService } from '../categories-api-service';
 import { Task } from '../tasks';
 import { Category } from '../category';
-import { SearchFilterPipe } from '../search-filter-pipe';
 import { filter } from 'rxjs/operators';
 
 /**
@@ -23,7 +22,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-tabela-tarefas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SearchFilterPipe],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './tabela-tarefas.html',
   styleUrls: ['./tabela-tarefas.css']
 })
@@ -34,6 +33,37 @@ export class TabelaTarefas implements OnInit {
   // Signals for reactive data
   taskList = signal<Task[]>([]);
   categories = signal<Category[]>([]);
+
+  // Computed: Filtered tasks with comprehensive search
+  filteredTasks = computed(() => {
+    const tasks = this.taskList();
+    const searchText = this.searchName?.toLowerCase().trim() || '';
+    const cats = this.categories();
+
+    if (!searchText) return tasks;
+
+    return tasks.filter(task => {
+      // Search in title
+      if (task.title?.toLowerCase().includes(searchText)) return true;
+      
+      // Search in description
+      if (task.description?.toLowerCase().includes(searchText)) return true;
+      
+      // Search in ID (convert to string)
+      if (task.id?.toString().includes(searchText)) return true;
+      
+      // Search in priority (convert to string)
+      if (task.priority?.toString().includes(searchText)) return true;
+      
+      // Search in category name
+      if (cats && cats.length > 0) {
+        const category = cats.find(c => c.id === task.categoryId);
+        if (category?.name?.toLowerCase().includes(searchText)) return true;
+      }
+      
+      return false;
+    });
+  });
   
   // Dependency injection
   private tasksApiService = inject(TasksApiService);

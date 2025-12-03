@@ -3,13 +3,14 @@
 
   <!-- FUNCIONALIDADE DE BUSCA/FILTRO COM PIPES -->
   <!-- Campo de pesquisa que usa ngModel para busca em tempo real -->
+  <!-- Pesquisa em: título, descrição, ID, categoria, prioridade -->
   <div class="mb-3">
     <label for="searchName" class="form-label">PESQUISA:</label>
-    <input type="text" [(ngModel)]="searchName" id="searchName" class="form-control" placeholder="Digite o título para pesquisar...">
+    <input type="text" [(ngModel)]="searchName" id="searchName" class="form-control" placeholder="Pesquisar por título, descrição, ID, categoria ou prioridade...">
   </div>
 
   <!-- Tabela Desktop -->
-  @if((taskList() | searchFilter:searchName).length > 0) {
+  @if(filteredTasks().length > 0) {
     <!-- Desktop Table -->
     <div class="table-responsive d-none d-md-block">
       <table class="table table-striped table-hover">
@@ -26,7 +27,7 @@
           </tr>
         </thead>
         <tbody>
-          @for(task of taskList() | searchFilter:searchName; track task.id) {
+          @for(task of filteredTasks(); track task.id) {
             <tr [class.table-success]="task.completed">
               <td>{{task.id}}</td>
               <td>{{task.title}}</td>
@@ -66,7 +67,7 @@
 
     <!-- Mobile Cards -->
     <div class="table-mobile d-md-none">
-      @for(task of taskList() | searchFilter:searchName; track task.id) {
+      @for(task of filteredTasks(); track task.id) {
         <div class="table-row-card" [class.table-success]="task.completed">
           <div class="row">
             <div class="col-12 col-label">ID</div>
@@ -119,6 +120,6 @@
       }
     </div>
   } @else {
-    <h4>Não há tarefas cadastradas!</h4>
+    <h4>Não há tarefas cadastradas ou nenhuma tarefa corresponde à pesquisa!</h4>
   }
 </div>
