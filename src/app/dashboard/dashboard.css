@@ -32,8 +32,101 @@
   opacity: 0.75;
 }
 
+.opacity-90 {
+  opacity: 0.90;
+}
+
 /* Altura igual para cards na mesma linha */
 .h-100 {
   height: 100%;
 }
 
+/* Responsive Design para Dashboard */
+@media (max-width: 992px) {
+  .container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  /* Cards de estatísticas em 2 colunas no tablet */
+  .row.mb-4 > div[class*="col-md"] {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Cards de estatísticas em 1 coluna no mobile */
+  .row.mb-4 > div[class*="col-md"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  /* Cards de tarefas em 1 coluna no mobile */
+  .row.gy-3 > div[class*="col-md-4"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  /* Títulos menores */
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+  }
+
+  /* Cards de estatísticas com texto menor */
+  .card-body h5 {
+    font-size: 0.9rem;
+  }
+
+  .card-body h2 {
+    font-size: 1.5rem;
+  }
+
+  .card-body small {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem !important;
+  }
+
+  .card-header h4 {
+    font-size: 1.1rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .card-text {
+    font-size: 0.9rem;
+  }
+
+  /* Badges menores no mobile */
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+  }
+
+  /* Botões menores */
+  .btn-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}

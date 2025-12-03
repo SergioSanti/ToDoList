@@ -79,12 +79,58 @@ footer {
 }
 
 /* ---------- AJUSTE DE LAYOUT RESPONSIVO ---------- */
+@media (max-width: 992px) {
+  body {
+    padding: 15px;
+  }
+  
+  .container {
+    padding: 0 15px;
+  }
+}
+
 @media (max-width: 768px) {
   body {
     padding: 10px;
   }
+  
   .container {
     padding: 0 10px;
+    max-width: 100%;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    padding: 5px;
+  }
+
+  .container {
+    padding: 0 5px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
   }
 }
 
@@ -123,4 +169,30 @@ footer {
 .navbar-nav .nav-link.active {
   background-color: #003f7f; /* cor mais escura da ativa */
   color: #fff;
+}
+
+/* Responsive Navbar */
+@media (max-width: 991px) {
+  .navbar-nav .nav-item {
+    margin: 0 0.5rem;
+  }
+
+  .navbar-nav .nav-link {
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-nav .nav-item {
+    margin: 0;
+    width: 100%;
+  }
+
+  .navbar-nav .nav-link {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    width: 100%;
+  }
 }

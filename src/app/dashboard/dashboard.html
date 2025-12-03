@@ -1,53 +1,89 @@
 <div class="container-fluid mt-4">
-  <h1 class="text-center mb-4">Tasks Dashboard</h1>
+  <h1 class="text-center mb-4">Dashboard de Tarefas</h1>
 
-  <!-- Statistics Cards -->
+  <!-- EDGE FUNCTIONS: Estatísticas processadas na nuvem -->
+  @if (edgeFunctionStats()) {
+    <div class="alert alert-info mb-4">
+      <h5>📊 Estatísticas Processadas (Edge Function)</h5>
+      <p class="mb-1">
+        <strong>Taxa de Conclusão:</strong> {{edgeFunctionStats()?.completionRate || 0}}% | 
+        <strong>Processado em:</strong> {{formatTimestamp(edgeFunctionStats()?.timestamp)}}
+      </p>
+      @if (edgeFunctionStats()?.categoryStats && edgeFunctionStats().categoryStats.length > 0) {
+        <details class="mt-2">
+          <summary>Estatísticas por Categoria</summary>
+          <ul class="mt-2 mb-0">
+            @for (stat of edgeFunctionStats().categoryStats; track stat.categoryId) {
+              <li>{{stat.categoryName}}: {{stat.taskCount}} tarefas ({{stat.completedCount}} completas)</li>
+            }
+          </ul>
+        </details>
+      }
+    </div>
+  }
+
+  <!-- Cards de Estatísticas -->
   <div class="row mb-4">
-    <div class="col-md-3 mb-3">
+    <div class="col-md-2 mb-3">
       <div class="card text-white bg-primary">
         <div class="card-body">
-          <h5 class="card-title">Total Tasks</h5>
+          <h5 class="card-title">Total de Tarefas</h5>
           <h2 class="card-text">{{totalTasks()}}</h2>
         </div>
       </div>
     </div>
-    <div class="col-md-3 mb-3">
+    <div class="col-md-2 mb-3">
       <div class="card text-white bg-success">
         <div class="card-body">
-          <h5 class="card-title">Active Tasks</h5>
+          <h5 class="card-title">Tarefas Ativas</h5>
           <h2 class="card-text">{{totalActive()}}</h2>
         </div>
       </div>
     </div>
-    <div class="col-md-3 mb-3">
+    <div class="col-md-2 mb-3">
+      <div class="card text-white bg-info">
+        <div class="card-body">
+          <h5 class="card-title">Tarefas Completas</h5>
+          <h2 class="card-text">{{totalCompleted()}}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 mb-3">
+      <div class="card text-white bg-warning">
+        <div class="card-body">
+          <h5 class="card-title">Tarefas Pendentes</h5>
+          <h2 class="card-text">{{totalPending()}}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 mb-3">
       <div class="card text-white bg-danger">
         <div class="card-body">
-          <h5 class="card-title">Deleted Tasks</h5>
+          <h5 class="card-title">Tarefas Excluídas</h5>
           <h2 class="card-text">{{totalDeleted()}}</h2>
         </div>
       </div>
     </div>
-    <div class="col-md-3 mb-3">
-      <div class="card text-white bg-info">
+    <div class="col-md-2 mb-3">
+      <div class="card text-white bg-secondary">
         <div class="card-body">
-          <h5 class="card-title">Completed</h5>
-          <h2 class="card-text">{{totalCompleted()}} / {{totalPending()}}</h2>
-          <small>Completed / Pending</small>
+          <h5 class="card-title">Taxa de Conclusão</h5>
+          <h2 class="card-text">{{totalActive() > 0 ? ((totalCompleted() / totalActive()) * 100).toFixed(0) : 0}}%</h2>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Active Tasks in Cards -->
+  <!-- Tarefas Ativas em Cards -->
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
         <div class="card-header bg-success text-white">
-          <h4 class="mb-0">Active Tasks ({{totalActive()}})</h4>
+          <h4 class="mb-0">Tarefas Ativas ({{totalActive()}})</h4>
         </div>
         <div class="card-body">
           @if (activeTasks().length === 0) {
-            <p class="text-muted text-center">No active tasks found.</p>
+            <p class="text-muted text-center">Nenhuma tarefa ativa encontrada.</p>
           } @else {
             <div class="row gy-3">
               @for (task of activeTasks(); track task.id) {
@@ -57,19 +93,28 @@
                       <h5 class="card-title">{{ task.title }}</h5>
                       <p class="card-text">{{ task.description }}</p>
                       
-                      <!-- Category with custom color -->
+                      <!-- STORAGE: Exibir arquivo anexado -->
+                      @if (task.fileUrl) {
+                        <div class="mb-2">
+                          <a [href]="task.fileUrl" target="_blank" class="btn btn-sm btn-info">
+                            📎 {{task.fileName || 'Ver Arquivo'}}
+                          </a>
+                        </div>
+                      }
+                      
+                      <!-- Categoria com cor personalizada -->
                       <div class="mb-2">
-                        <strong>Category:</strong> 
+                        <strong>Categoria:</strong> 
                         <span class="badge" [style.background-color]="getCategoryColor(task.categoryId)" [style.color]="getContrastColor(getCategoryColor(task.categoryId))">
                           {{ getCategoryName(task.categoryId) }}
                         </span>
                       </div>
                       
-                      <!-- Priority and Status -->
+                      <!-- Prioridade e Status -->
                       <div class="row">
                         <div class="col-6">
                           <p class="card-text mb-1">
-                            <strong>Priority:</strong> 
+                            <strong>Prioridade:</strong> 
                             <span class="badge" [ngClass]="{
                               'bg-danger': task.priority >= 4,
                               'bg-warning': task.priority === 3,
@@ -84,7 +129,7 @@
                           <p class="card-text mb-1">
                             <strong>Status:</strong> 
                             <span class="badge" [ngClass]="task.completed ? 'bg-success' : 'bg-secondary'">
-                              {{ task.completed ? 'Completed' : 'Pending' }}
+                              {{ task.completed ? 'Concluída' : 'Pendente' }}
                             </span>
                           </p>
                         </div>
@@ -100,16 +145,87 @@
     </div>
   </div>
 
-  <!-- Deleted Tasks in Cards -->
+  <!-- Tarefas Completas em Cards -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h4 class="mb-0">Tarefas Completas ({{totalCompleted()}})</h4>
+        </div>
+        <div class="card-body">
+          @if (completedTasks().length === 0) {
+            <p class="text-muted text-center">Nenhuma tarefa completa encontrada.</p>
+          } @else {
+            <div class="row gy-3">
+              @for (task of completedTasks(); track task.id) {
+                <div class="col-md-4">
+                  <div class="card shadow h-100 opacity-90" [style.border-left]="'5px solid ' + getCategoryColor(task.categoryId)">
+                    <div class="card-body">
+                      <h5 class="card-title">
+                        <span class="text-success">✓</span> {{ task.title }}
+                      </h5>
+                      <p class="card-text">{{ task.description }}</p>
+                      
+                      <!-- STORAGE: Exibir arquivo anexado -->
+                      @if (task.fileUrl) {
+                        <div class="mb-2">
+                          <a [href]="task.fileUrl" target="_blank" class="btn btn-sm btn-info">
+                            📎 {{task.fileName || 'Ver Arquivo'}}
+                          </a>
+                        </div>
+                      }
+                      
+                      <!-- Categoria com cor personalizada -->
+                      <div class="mb-2">
+                        <strong>Categoria:</strong> 
+                        <span class="badge" [style.background-color]="getCategoryColor(task.categoryId)" [style.color]="getContrastColor(getCategoryColor(task.categoryId))">
+                          {{ getCategoryName(task.categoryId) }}
+                        </span>
+                      </div>
+                      
+                      <!-- Prioridade e Status -->
+                      <div class="row">
+                        <div class="col-6">
+                          <p class="card-text mb-1">
+                            <strong>Prioridade:</strong> 
+                            <span class="badge" [ngClass]="{
+                              'bg-danger': task.priority >= 4,
+                              'bg-warning': task.priority === 3,
+                              'bg-info': task.priority === 2,
+                              'bg-success': task.priority === 1
+                            }">
+                              {{ task.priority }}
+                            </span>
+                          </p>
+                        </div>
+                        <div class="col-6">
+                          <p class="card-text mb-1">
+                            <strong>Status:</strong> 
+                            <span class="badge bg-success">Concluída</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarefas Excluídas em Cards -->
   <div class="row">
     <div class="col-12">
       <div class="card">
         <div class="card-header bg-danger text-white">
-          <h4 class="mb-0">Deleted Tasks ({{totalDeleted()}})</h4>
+          <h4 class="mb-0">Tarefas Excluídas ({{totalDeleted()}})</h4>
         </div>
         <div class="card-body">
           @if (deletedTasks().length === 0) {
-            <p class="text-muted text-center">No deleted tasks found.</p>
+            <p class="text-muted text-center">Nenhuma tarefa excluída encontrada.</p>
           } @else {
             <div class="row gy-3">
               @for (task of deletedTasks(); track task.id) {
@@ -119,19 +235,19 @@
                       <h5 class="card-title"><del>{{ task.title }}</del></h5>
                       <p class="card-text"><del>{{ task.description }}</del></p>
                       
-                      <!-- Category with custom color -->
+                      <!-- Categoria com cor personalizada -->
                       <div class="mb-2">
-                        <strong>Category:</strong> 
+                        <strong>Categoria:</strong> 
                         <span class="badge" [style.background-color]="getCategoryColor(task.categoryId)" [style.color]="getContrastColor(getCategoryColor(task.categoryId))">
                           {{ getCategoryName(task.categoryId) }}
                         </span>
                       </div>
                       
-                      <!-- Priority and Status -->
+                      <!-- Prioridade e Status -->
                       <div class="row mb-2">
                         <div class="col-6">
                           <p class="card-text mb-1">
-                            <strong>Priority:</strong> 
+                            <strong>Prioridade:</strong> 
                             <span class="badge" [ngClass]="{
                               'bg-danger': task.priority >= 4,
                               'bg-warning': task.priority === 3,
@@ -146,18 +262,18 @@
                           <p class="card-text mb-1">
                             <strong>Status:</strong> 
                             <span class="badge" [ngClass]="task.completed ? 'bg-success' : 'bg-secondary'">
-                              {{ task.completed ? 'Completed' : 'Pending' }}
+                              {{ task.completed ? 'Concluída' : 'Pendente' }}
                             </span>
                           </p>
                         </div>
                       </div>
                       
-                      <!-- Restore Button -->
+                      <!-- Botão Restaurar -->
                       <div class="mt-auto">
                         <button 
                           class="btn btn-sm btn-success w-100" 
                           (click)="restoreTask(task.id)">
-                          Restore Task
+                          Restaurar Tarefa
                         </button>
                       </div>
                     </div>

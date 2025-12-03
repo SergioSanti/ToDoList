@@ -1,10 +1,10 @@
 <div class="container mt-4">
-  <h2>{{actionButton}} Category</h2>
+  <h2>{{actionButton}} Categoria</h2>
   
   <form (ngSubmit)="save()">
-    <!-- VALIDATION: Required fields with visual feedback -->
+    <!-- VALIDAÇÃO: Campos obrigatórios com feedback visual -->
     <div class="mb-3">
-      <label for="name" class="form-label">Name: <span class="text-danger">*</span></label>
+      <label for="name" class="form-label">Nome: <span class="text-danger">*</span></label>
       <input 
         type="text" 
         [(ngModel)]="category().name" 
@@ -19,7 +19,7 @@
     </div>
 
     <div class="mb-3">
-      <label for="description" class="form-label">Description: <span class="text-danger">*</span></label>
+      <label for="description" class="form-label">Descrição: <span class="text-danger">*</span></label>
       <textarea 
         [(ngModel)]="category().description" 
         id="description" 
@@ -34,13 +34,13 @@
     </div>
 
     <div class="mb-3">
-      <label for="color" class="form-label">Color:</label>
+      <label for="color" class="form-label">Cor:</label>
       <input type="color" [(ngModel)]="category().color" id="color" name="color" class="form-control form-control-color">
     </div>
 
     <div class="mb-3">
       <button type="submit" class="btn btn-primary me-2">{{actionButton}}</button>
-      <button type="button" class="btn btn-secondary" (click)="goBack()">Back</button>
+      <button type="button" class="btn btn-secondary" (click)="goBack()">Voltar</button>
     </div>
   </form>
 </div>

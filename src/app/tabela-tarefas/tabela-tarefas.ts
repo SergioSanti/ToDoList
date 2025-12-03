@@ -72,11 +72,29 @@ export class TabelaTarefas implements OnInit {
   }
 
   /**
+   * Toggle task completion status
+   * Quick action to mark task as complete/incomplete
+   */
+  toggleComplete(task: Task) {
+    const updatedTask: Task = {
+      ...task,
+      completed: !task.completed
+    };
+    
+    this.tasksApiService.update(task.id, updatedTask).subscribe(() => {
+      // Update local list
+      this.taskList.update(tasks => 
+        tasks.map(t => t.id === task.id ? updatedTask : t)
+      );
+    });
+  }
+
+  /**
    * DELETE - Remove task
    * CRUD: Delete operation
    */
   delete(id: number) {
-    if (confirm('Are you sure you want to delete this task?')) {
+    if (confirm('Tem certeza que deseja deletar esta tarefa?')) {
       this.tasksApiService.delete(id).subscribe(() => {
         // Update local list after deletion
         this.taskList.set(this.taskList().filter(t => t.id !== id));
@@ -91,6 +109,6 @@ export class TabelaTarefas implements OnInit {
    */
   getCategoryName(categoryId: number): string {
     const category = this.categories().find(c => c.id === categoryId);
-    return category ? category.name : 'No category';
+    return category ? category.name : 'Sem categoria';
   }
 }

@@ -145,6 +145,7 @@
   .navbar-nav .nav-link {
     padding: 0.75rem 1rem !important;
     margin: 0.25rem 0;
+    text-align: center;
   }
   
   .btn-logout {
@@ -156,10 +157,49 @@
   .nav-text, .logout-text {
     display: inline-block;
   }
+
+  .system-title {
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+  }
+
+  .system-header {
+    padding: 1rem 0;
+  }
+
+  .btn-logout-fixed {
+    width: 45px;
+    height: 45px;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.3rem;
+  }
+
+  .logout-icon-fixed {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .system-title {
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-logout-fixed {
+    width: 40px;
+    height: 40px;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.2rem;
+  }
+
+  .logout-icon-fixed {
+    font-size: 1.3rem;
+  }
 }
 
 /* Smooth transitions */
 * {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-

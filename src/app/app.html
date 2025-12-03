@@ -1,14 +1,14 @@
-<!-- System Title -->
+<!-- Título do Sistema -->
 <div class="system-header">
     <h1 class="system-title">TaskMaster</h1>
 </div>
 
-<!-- Fixed Logout Button (Top Right Corner) -->
-<button class="btn btn-logout-fixed" (click)="logout()" type="button" title="Sign Out">
+<!-- Botão de Logout Fixo (Canto Superior Direito) -->
+<button class="btn btn-logout-fixed" (click)="logout()" type="button" title="Sair">
     <span class="logout-icon-fixed">×</span>
 </button>
 
-<!-- SPA NAVIGATION: Centered navigation bar -->
+<!-- NAVEGAÇÃO SPA: Barra de navegação centralizada -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary custom-navbar">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,7 +16,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
-                <!-- SPA NAVIGATION: Links to different screens -->
+                <!-- NAVEGAÇÃO SPA: Links para diferentes telas -->
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
                         Dashboard
@@ -24,22 +24,22 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/tabela" routerLinkActive="active">
-                        Tasks
+                        Tarefas
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/novo" routerLinkActive="active">
-                        New Task
+                        Nova Tarefa
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/tabela-categoria" routerLinkActive="active">
-                        Categories
+                        Categorias
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/novo-categoria" routerLinkActive="active">
-                        New Category
+                        Nova Categoria
                     </a>
                 </li>
             </ul>
@@ -47,9 +47,8 @@
     </div>
 </nav>
 
-<!-- SPA NAVIGATION: RouterOutlet renders route components -->
+<!-- NAVEGAÇÃO SPA: RouterOutlet renderiza componentes das rotas -->
 <router-outlet />
-
 
 
 

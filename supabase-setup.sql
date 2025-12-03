@@ -41,6 +41,8 @@ CREATE TABLE IF NOT EXISTS tarefas (
   concluida BOOLEAN DEFAULT FALSE NOT NULL,
   excluida BOOLEAN DEFAULT FALSE NOT NULL,
   categoria_id BIGINT NOT NULL REFERENCES categorias(id) ON DELETE RESTRICT,
+  arquivo_url TEXT,  -- STORAGE: URL do arquivo anexado (imagem, vídeo, pdf, etc)
+  arquivo_nome VARCHAR(255),  -- STORAGE: Nome original do arquivo
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -117,5 +119,6 @@ ON CONFLICT DO NOTHING;
 -- 1. Configure Authentication (Settings → Authentication → Providers)
 -- 2. Crie um usuário de teste (Authentication → Users → Add user)
 -- 3. Configure Storage (Storage → New bucket → nome: tarefas-arquivos)
--- 4. Configure as credenciais no arquivo supabase-client.ts
-
+-- 4. Execute o script storage-policies.sql para configurar políticas de Storage
+-- 5. Crie a Edge Function 'resumo-tarefas' (veja EDGE_FUNCTION_CODE.md)
+-- 6. Configure as credenciais no arquivo supabase-client.ts

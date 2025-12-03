@@ -7,7 +7,7 @@ import { getSupabaseClient } from './supabase-client';
  * TASKS API SERVICE - COMPLETE CRUD WITH SUPABASE DATABASE
  *
  * Supabase table: "tarefas"
- * Fields: id (PK), titulo, descricao, prioridade, concluida, categoria_id, excluida
+ * Fields: id (PK), titulo, descricao, prioridade, concluida, categoria_id, excluida, arquivo_url, arquivo_nome
  */
 @Injectable({ providedIn: 'root' })
 export class TasksApiService {
@@ -34,6 +34,8 @@ export class TasksApiService {
           completed: item.concluida,
           categoryId: item.categoria_id,
           deleted: item.excluida || false,
+          fileUrl: item.arquivo_url || undefined,
+          fileName: item.arquivo_nome || undefined,
           created_at: item.created_at,
           updated_at: item.updated_at
         } as Task));
@@ -62,6 +64,8 @@ export class TasksApiService {
           completed: item.concluida,
           categoryId: item.categoria_id,
           deleted: item.excluida || false,
+          fileUrl: item.arquivo_url || undefined,
+          fileName: item.arquivo_nome || undefined,
           created_at: item.created_at,
           updated_at: item.updated_at
         } as Task));
@@ -91,6 +95,8 @@ export class TasksApiService {
           completed: item.concluida,
           categoryId: item.categoria_id,
           deleted: item.excluida || false,
+          fileUrl: item.arquivo_url || undefined,
+          fileName: item.arquivo_nome || undefined,
           created_at: item.created_at,
           updated_at: item.updated_at
         } as Task));
@@ -132,6 +138,8 @@ export class TasksApiService {
           completed: data.concluida,
           categoryId: data.categoria_id,
           deleted: data.excluida || false,
+          fileUrl: data.arquivo_url || undefined,
+          fileName: data.arquivo_nome || undefined,
           created_at: data.created_at,
           updated_at: data.updated_at
         } as Task;
@@ -150,7 +158,9 @@ export class TasksApiService {
       prioridade: task.priority,
       concluida: task.completed || false,
       categoria_id: task.categoryId,
-      excluida: false
+      excluida: false,
+      arquivo_url: task.fileUrl || null,
+      arquivo_nome: task.fileName || null
     };
 
     return from(
@@ -170,6 +180,8 @@ export class TasksApiService {
           completed: data.concluida,
           categoryId: data.categoria_id,
           deleted: data.excluida || false,
+          fileUrl: data.arquivo_url || undefined,
+          fileName: data.arquivo_nome || undefined,
           created_at: data.created_at,
           updated_at: data.updated_at
         } as Task;
@@ -187,7 +199,9 @@ export class TasksApiService {
       descricao: task.description,
       prioridade: task.priority,
       concluida: task.completed || false,
-      categoria_id: task.categoryId
+      categoria_id: task.categoryId,
+      arquivo_url: task.fileUrl || null,
+      arquivo_nome: task.fileName || null
     };
 
     return from(
@@ -208,6 +222,8 @@ export class TasksApiService {
           completed: data.concluida,
           categoryId: data.categoria_id,
           deleted: data.excluida || false,
+          fileUrl: data.arquivo_url || undefined,
+          fileName: data.arquivo_nome || undefined,
           created_at: data.created_at,
           updated_at: data.updated_at
         } as Task;
@@ -238,6 +254,8 @@ export class TasksApiService {
           completed: data.concluida,
           categoryId: data.categoria_id,
           deleted: data.excluida || false,
+          fileUrl: data.arquivo_url || undefined,
+          fileName: data.arquivo_nome || undefined,
           created_at: data.created_at,
           updated_at: data.updated_at
         } as Task;
@@ -268,6 +286,8 @@ export class TasksApiService {
           completed: data.concluida,
           categoryId: data.categoria_id,
           deleted: data.excluida || false,
+          fileUrl: data.arquivo_url || undefined,
+          fileName: data.arquivo_nome || undefined,
           created_at: data.created_at,
           updated_at: data.updated_at
         } as Task;

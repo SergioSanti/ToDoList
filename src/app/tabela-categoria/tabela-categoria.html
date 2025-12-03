@@ -1,15 +1,15 @@
 <div class="container">
-  <h2>Categories Table</h2>
+  <h2>Tabela de Categorias</h2>
 
   @if(categoryList().length > 0) {
     <table class="table table-striped table-hover">
       <thead class="table-primary">
         <tr>
           <th>ID</th>
-          <th>NAME</th>
-          <th>DESCRIPTION</th>
-          <th>COLOR</th>
-          <th colspan="2">ACTION</th>
+          <th>NOME</th>
+          <th>DESCRIÇÃO</th>
+          <th>COR</th>
+          <th colspan="2">AÇÃO</th>
         </tr>
       </thead>
       <tbody>
@@ -23,13 +23,13 @@
                 {{category.color}}
               </span>
             </td>
-            <td><a class="btn btn-primary" routerLink="/edit-categoria/{{category.id}}">Edit</a></td>
-            <td><a class="btn btn-danger" (click)="delete(category.id)">Delete</a></td>
+            <td><a class="btn btn-primary btn-sm" routerLink="/edit-categoria/{{category.id}}">Editar</a></td>
+            <td><a class="btn btn-danger btn-sm" (click)="delete(category.id)">Deletar</a></td>
           </tr>
         }
       </tbody>
     </table>
   } @else {
-    <h4>No categories registered!</h4>
+    <h4>Não há categorias cadastradas!</h4>
   }
 </div>

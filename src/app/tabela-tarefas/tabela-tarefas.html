@@ -1,47 +1,124 @@
 <div class="container">
-  <h2>Tasks Table</h2>
+  <h2>Tabela de Tarefas</h2>
 
-  <!-- SEARCH/FILTER FUNCTIONALITY WITH PIPES -->
-  <!-- Search field that uses ngModel for real-time search -->
+  <!-- FUNCIONALIDADE DE BUSCA/FILTRO COM PIPES -->
+  <!-- Campo de pesquisa que usa ngModel para busca em tempo real -->
   <div class="mb-3">
-    <label for="searchName" class="form-label">SEARCH:</label>
-    <input type="text" [(ngModel)]="searchName" id="searchName" class="form-control" placeholder="Type title to search...">
+    <label for="searchName" class="form-label">PESQUISA:</label>
+    <input type="text" [(ngModel)]="searchName" id="searchName" class="form-control" placeholder="Digite o título para pesquisar...">
   </div>
 
-  <!-- Table with filter applied via Pipe -->
+  <!-- Tabela Desktop -->
   @if((taskList() | searchFilter:searchName).length > 0) {
-    <table class="table table-striped table-hover">
-      <thead class="table-primary">
-        <tr>
-          <th>ID</th>
-          <th>TITLE</th>
-          <th>DESCRIPTION</th>
-          <th>CATEGORY</th> <!-- RELATIONSHIP: Shows task category -->
-          <th>PRIORITY</th>
-          <th>COMPLETED</th>
-          <th colspan="2">ACTION</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Loop with filter applied via searchFilter pipe -->
-        @for(task of taskList() | searchFilter:searchName; track task.id) {
+    <!-- Desktop Table -->
+    <div class="table-responsive d-none d-md-block">
+      <table class="table table-striped table-hover">
+        <thead class="table-primary">
           <tr>
-            <td>{{task.id}}</td>
-            <td>{{task.title}}</td>
-            <td>{{task.description}}</td>
-            <!-- RELATIONSHIP: Get category name by ID -->
-            <td>{{getCategoryName(task.categoryId)}}</td>
-            <td>{{task.priority}}</td>
-            <td>{{task.completed ? 'Yes' : 'No'}}</td>
-            <!-- SPA NAVIGATION: RouterLink for editing -->
-            <td><a class="btn btn-primary" routerLink="/edit/{{task.id}}">Edit</a></td>
-            <!-- CRUD: Delete operation -->
-            <td><a class="btn btn-danger" (click)="delete(task.id)">Delete</a></td>
+            <th>ID</th>
+            <th>TÍTULO</th>
+            <th>DESCRIÇÃO</th>
+            <th>CATEGORIA</th>
+            <th>PRIORIDADE</th>
+            <th>CONCLUÍDA</th>
+            <th>ARQUIVO</th>
+            <th colspan="3">AÇÃO</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for(task of taskList() | searchFilter:searchName; track task.id) {
+            <tr [class.table-success]="task.completed">
+              <td>{{task.id}}</td>
+              <td>{{task.title}}</td>
+              <td>{{task.description}}</td>
+              <td>{{getCategoryName(task.categoryId)}}</td>
+              <td>{{task.priority}}</td>
+              <td>
+                <span class="badge" [ngClass]="task.completed ? 'bg-success' : 'bg-secondary'">
+                  {{task.completed ? 'Sim' : 'Não'}}
+                </span>
+              </td>
+              <td>
+                @if (task.fileUrl) {
+                  <a [href]="task.fileUrl" target="_blank" class="btn btn-sm btn-info" title="Download">
+                    📎 {{task.fileName || 'Arquivo'}}
+                  </a>
+                } @else {
+                  <span class="text-muted">-</span>
+                }
+              </td>
+              <td>
+                <button 
+                  class="btn btn-sm" 
+                  [ngClass]="task.completed ? 'btn-warning' : 'btn-success'"
+                  (click)="toggleComplete(task)"
+                  [title]="task.completed ? 'Marcar como pendente' : 'Marcar como completa'">
+                  {{task.completed ? '↩️' : '✓'}}
+                </button>
+              </td>
+              <td><a class="btn btn-primary btn-sm" routerLink="/edit/{{task.id}}">Editar</a></td>
+              <td><a class="btn btn-danger btn-sm" (click)="delete(task.id)">Deletar</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="table-mobile d-md-none">
+      @for(task of taskList() | searchFilter:searchName; track task.id) {
+        <div class="table-row-card" [class.table-success]="task.completed">
+          <div class="row">
+            <div class="col-12 col-label">ID</div>
+            <div class="col-12 col-value">{{task.id}}</div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-label">TÍTULO</div>
+            <div class="col-12 col-value"><strong>{{task.title}}</strong></div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-label">DESCRIÇÃO</div>
+            <div class="col-12 col-value">{{task.description}}</div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-label">CATEGORIA</div>
+            <div class="col-12 col-value">{{getCategoryName(task.categoryId)}}</div>
+          </div>
+          <div class="row">
+            <div class="col-6 col-label">PRIORIDADE</div>
+            <div class="col-6 col-label">CONCLUÍDA</div>
+            <div class="col-6 col-value">{{task.priority}}</div>
+            <div class="col-6 col-value">
+              <span class="badge" [ngClass]="task.completed ? 'bg-success' : 'bg-secondary'">
+                {{task.completed ? 'Sim' : 'Não'}}
+              </span>
+            </div>
+          </div>
+          @if (task.fileUrl) {
+            <div class="row">
+              <div class="col-12 col-label">ARQUIVO</div>
+              <div class="col-12 col-value">
+                <a [href]="task.fileUrl" target="_blank" class="btn btn-sm btn-info w-100">
+                  📎 {{task.fileName || 'Download Arquivo'}}
+                </a>
+              </div>
+            </div>
+          }
+          <div class="actions">
+            <button 
+              class="btn btn-sm" 
+              [ngClass]="task.completed ? 'btn-warning' : 'btn-success'"
+              (click)="toggleComplete(task)"
+              [title]="task.completed ? 'Marcar como pendente' : 'Marcar como completa'">
+              {{task.completed ? '↩️' : '✓'}}
+            </button>
+            <a class="btn btn-primary btn-sm" routerLink="/edit/{{task.id}}">Editar</a>
+            <a class="btn btn-danger btn-sm" (click)="delete(task.id)">Deletar</a>
+          </div>
+        </div>
+      }
+    </div>
   } @else {
-    <h4>No tasks registered!</h4>
+    <h4>Não há tarefas cadastradas!</h4>
   }
 </div>

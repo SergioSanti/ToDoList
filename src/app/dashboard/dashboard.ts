@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TasksApiService } from '../tasks-api-service';
 import { CategoriesApiService } from '../categories-api-service';
+import { EdgeFunctionsService } from '../edge-functions-service';
 import { Task } from '../tasks';
 import { Category } from '../category';
 
@@ -14,6 +15,7 @@ import { Category } from '../category';
  * - Statistics and task summary
  * - Separation between active and deleted tasks
  * - Relationship with Categories
+ * - EDGE FUNCTIONS: Uses cloud function for business logic
  */
 @Component({
   selector: 'app-dashboard',
@@ -26,22 +28,29 @@ export class Dashboard implements OnInit {
   // Signals for reactive data
   allTasks = signal<Task[]>([]);
   activeTasks = signal<Task[]>([]);
+  completedTasks = signal<Task[]>([]);
   deletedTasks = signal<Task[]>([]);
   categories = signal<Category[]>([]);
   
   // Statistics
   totalTasks = signal<number>(0);
   totalActive = signal<number>(0);
-  totalDeleted = signal<number>(0);
   totalCompleted = signal<number>(0);
+  totalDeleted = signal<number>(0);
   totalPending = signal<number>(0);
+
+  // EDGE FUNCTIONS: Statistics from cloud function
+  edgeFunctionStats = signal<any>(null);
+  isLoadingStats = signal<boolean>(false);
 
   // Dependency injection
   private tasksApiService = inject(TasksApiService);
   private categoriesApiService = inject(CategoriesApiService);
+  private edgeFunctionsService = inject(EdgeFunctionsService);
 
   ngOnInit() {
     this.loadData();
+    this.loadEdgeFunctionStats();
   }
 
   /**
@@ -52,18 +61,20 @@ export class Dashboard implements OnInit {
     this.tasksApiService.listAll().subscribe((tasks) => {
       this.allTasks.set(tasks);
       
-      // Separate active and deleted tasks
+      // Separate tasks by status
       const active = tasks.filter(t => !t.deleted);
+      const completed = active.filter(t => t.completed);
       const deleted = tasks.filter(t => t.deleted);
       
       this.activeTasks.set(active);
+      this.completedTasks.set(completed);
       this.deletedTasks.set(deleted);
       
       // Calculate statistics
       this.totalTasks.set(tasks.length);
       this.totalActive.set(active.length);
+      this.totalCompleted.set(completed.length);
       this.totalDeleted.set(deleted.length);
-      this.totalCompleted.set(active.filter(t => t.completed).length);
       this.totalPending.set(active.filter(t => !t.completed).length);
     });
 
@@ -74,21 +85,54 @@ export class Dashboard implements OnInit {
   }
 
   /**
+   * EDGE FUNCTIONS: Load statistics from cloud function
+   * BUSINESS FUNCTIONALITY: Uses Edge Function to process data
+   */
+  loadEdgeFunctionStats() {
+    this.isLoadingStats.set(true);
+    this.edgeFunctionsService.getTaskSummary().subscribe({
+      next: (stats) => {
+        this.edgeFunctionStats.set(stats);
+        this.isLoadingStats.set(false);
+        console.log('Edge Function Stats:', stats);
+      },
+      error: (err) => {
+        console.error('Error loading Edge Function stats:', err);
+        this.isLoadingStats.set(false);
+        // Continue without Edge Function stats if it fails
+      }
+    });
+  }
+
+  /**
+   * Format timestamp for display
+   */
+  formatTimestamp(timestamp?: string): string {
+    if (!timestamp) return '-';
+    try {
+      return new Date(timestamp).toLocaleString('pt-BR');
+    } catch {
+      return '-';
+    }
+  }
+
+  /**
    * Get category name by ID
    * RELATIONSHIP: Tasks → Categories
    */
   getCategoryName(categoryId: number): string {
     const category = this.categories().find(c => c.id === categoryId);
-    return category ? category.name : 'No category';
+    return category ? category.name : 'Sem categoria';
   }
 
   /**
    * Restore deleted task
    */
   restoreTask(id: number) {
-    if (confirm('Do you want to restore this task?')) {
+    if (confirm('Deseja restaurar esta tarefa?')) {
       this.tasksApiService.restore(id).subscribe(() => {
         this.loadData();
+        this.loadEdgeFunctionStats(); // Reload Edge Function stats
       });
     }
   }

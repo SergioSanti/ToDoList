@@ -1,0 +1,108 @@
+/* Responsive Table Styles */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile: Transform table into cards */
+@media (max-width: 768px) {
+  .table {
+    display: none;
+  }
+
+  .table-mobile {
+    display: block;
+  }
+
+  /* Card style for mobile table rows */
+  .table-mobile .table-row-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .table-mobile .table-row-card.table-success {
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+  }
+
+  .table-mobile .table-row-card .row {
+    margin-bottom: 0.5rem;
+  }
+
+  .table-mobile .table-row-card .row:last-child {
+    margin-bottom: 0;
+  }
+
+  .table-mobile .table-row-card .col-label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .table-mobile .table-row-card .col-value {
+    margin-bottom: 0.5rem;
+  }
+
+  .table-mobile .table-row-card .actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .table-mobile .table-row-card .actions .btn {
+    flex: 1;
+    min-width: 80px;
+  }
+}
+
+/* Desktop: Show table, hide mobile cards */
+@media (min-width: 769px) {
+  .table {
+    display: table;
+  }
+
+  .table-mobile {
+    display: none;
+  }
+}
+
+/* Responsive buttons */
+@media (max-width: 576px) {
+  .btn-sm {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+
+  .form-control {
+    font-size: 0.9rem;
+  }
+}
+
+/* Table row highlight for completed tasks */
+.table-success {
+  background-color: #d1e7dd !important;
+}
+
+.table tbody tr.table-success:hover {
+  background-color: #c3e6d0 !important;
+}
+
