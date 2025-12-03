@@ -85,6 +85,20 @@ export class Dashboard implements OnInit {
   }
 
   /**
+   * Calculate completion rate correctly
+   * Taxa = (Completas / (Ativas + Completas)) * 100
+   */
+  calculateCompletionRate(): number {
+    const active = this.totalActive();
+    const completed = this.totalCompleted();
+    const totalNotDeleted = active + completed;
+    
+    if (totalNotDeleted === 0) return 0;
+    
+    return Math.round((completed / totalNotDeleted) * 100);
+  }
+
+  /**
    * EDGE FUNCTIONS: Load statistics from cloud function
    * BUSINESS FUNCTIONALITY: Uses Edge Function to process data
    */

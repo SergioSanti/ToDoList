@@ -6,7 +6,13 @@
   <!-- Pesquisa em: título, descrição, ID, categoria, prioridade -->
   <div class="mb-3">
     <label for="searchName" class="form-label">PESQUISA:</label>
-    <input type="text" [(ngModel)]="searchName" id="searchName" class="form-control" placeholder="Pesquisar por título, descrição, ID, categoria ou prioridade...">
+    <input 
+      type="text" 
+      [value]="searchName()" 
+      (input)="onSearchChange($any($event.target).value)"
+      id="searchName" 
+      class="form-control" 
+      placeholder="Pesquisar por título, descrição, ID, categoria ou prioridade...">
   </div>
 
   <!-- Tabela Desktop -->

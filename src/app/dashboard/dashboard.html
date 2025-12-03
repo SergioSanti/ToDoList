@@ -68,7 +68,7 @@
       <div class="card text-white bg-secondary">
         <div class="card-body">
           <h5 class="card-title">Taxa de Conclusão</h5>
-          <h2 class="card-text">{{totalActive() > 0 ? ((totalCompleted() / totalActive()) * 100).toFixed(0) : 0}}%</h2>
+          <h2 class="card-text">{{calculateCompletionRate()}}%</h2>
         </div>
       </div>
     </div>

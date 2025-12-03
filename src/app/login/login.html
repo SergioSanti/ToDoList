@@ -3,8 +3,8 @@
     <form (ngSubmit)="performLogin()">
       <div class="text-center mb-4">
 
-        <h1 class="h4 mb-3 fw-normal">Access your account</h1>
-        <p class="text-body-secondary">Use your username and password to sign in</p>
+        <h1 class="h4 mb-3 fw-normal">Acesse sua conta</h1>
+        <p class="text-body-secondary">Use seu usuário e senha para entrar</p>
       </div>
 
       <div class="form-floating mb-3">
@@ -12,12 +12,12 @@
           type="text"
           id="user"
           class="form-control"
-          placeholder="User"
+          placeholder="Usuário"
           [(ngModel)]="user"
           name="user"
           required
         />
-        <label for="user">User</label>
+        <label for="user">Usuário</label>
       </div>
 
       <div class="form-floating mb-3">
@@ -25,19 +25,19 @@
           type="password"
           id="password"
           class="form-control"
-          placeholder="Password"
+          placeholder="Senha"
           [(ngModel)]="password"
           name="password"
           required
         />
-        <label for="password">Password</label>
+        <label for="password">Senha</label>
       </div>
 
       <button
         type="submit"
         class="btn btn-primary w-100 py-2 fw-semibold rounded-3"
       >
-        Sign In
+        Entrar
       </button>
 
       @if (error()) {
@@ -48,7 +48,7 @@
 
       <p class="mt-4 mb-0 text-center">
         <a href="#" class="text-decoration-none text-secondary">
-          Forgot password?
+          Esqueceu a senha?
         </a>
       </p>
     </form>

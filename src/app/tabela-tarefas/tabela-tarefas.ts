@@ -27,8 +27,8 @@ import { filter } from 'rxjs/operators';
   styleUrls: ['./tabela-tarefas.css']
 })
 export class TabelaTarefas implements OnInit {
-  // Search field for filter
-  searchName = '';
+  // Search field for filter - MUST be signal for computed to work
+  searchName = signal<string>('');
   
   // Signals for reactive data
   taskList = signal<Task[]>([]);
@@ -37,7 +37,7 @@ export class TabelaTarefas implements OnInit {
   // Computed: Filtered tasks with comprehensive search
   filteredTasks = computed(() => {
     const tasks = this.taskList();
-    const searchText = this.searchName?.toLowerCase().trim() || '';
+    const searchText = this.searchName()?.toLowerCase().trim() || '';
     const cats = this.categories();
 
     if (!searchText) return tasks;
@@ -99,6 +99,13 @@ export class TabelaTarefas implements OnInit {
     this.categoriesApiService.list().subscribe((categories) => {
       this.categories.set(categories);
     });
+  }
+
+  /**
+   * Update search text
+   */
+  onSearchChange(value: string) {
+    this.searchName.set(value);
   }
 
   /**
