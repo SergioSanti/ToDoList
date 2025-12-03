@@ -18,8 +18,9 @@ export class AuthService {
 
   /**
    * LOGIN - Uses Supabase Authentication (email/password)
+   * Returns the session data if login is successful
    */
-  login(email: string, password: string): Observable<boolean> {
+  login(email: string, password: string): Observable<{ success: boolean; session: any }> {
     const supabase = getSupabaseClient();
 
     return from(
@@ -29,23 +30,53 @@ export class AuthService {
       })
     ).pipe(
       map(result => {
-        return !result.error && !!result.data.session;
+        if (result.error) {
+          console.error('Login error:', result.error);
+          return { success: false, session: null };
+        }
+        // Session is automatically saved by Supabase when persistSession is true
+        return { success: !!result.data.session, session: result.data.session };
       })
     );
   }
 
   /**
-   * LOGIN CHECK
-   * Uses the session maintained by Supabase.
+   * LOGIN CHECK - Async version
+   * Checks the session asynchronously using Supabase API
+   * This is the most reliable method to check if user is logged in
+   */
+  async isLoggedInAsync(): Promise<boolean> {
+    const supabase = getSupabaseClient();
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Session check error:', error);
+        return false;
+      }
+      return !!session;
+    } catch (err) {
+      console.error('Session check exception:', err);
+      return false;
+    }
+  }
+
+  /**
+   * LOGIN CHECK - Synchronous version
+   * For use in guards and synchronous checks
+   * Note: This is a best-effort check. Use isLoggedInAsync() for accurate verification.
    */
   isLoggedIn(): boolean {
     const supabase = getSupabaseClient();
-    const session = supabase.auth.getSession();
-    // getSession() returns a Promise, so here we do a simple check
-    // based on Supabase internal storage (persistSession).
-    // For RouteGuard (synchronous), we use the existence of the item in localStorage.
-    const hasSupabaseAuthStorage = !!localStorage.getItem('sb-' /* default prefix */);
-    return hasSupabaseAuthStorage;
+    // Check if there's a session in localStorage
+    // Supabase stores session with key pattern: sb-{project-ref}-auth-token
+    try {
+      const keys = Object.keys(localStorage);
+      const projectRef = 'ouewdngpvwiaqxlouckj'; // From SUPABASE_URL
+      const sessionKey = `sb-${projectRef}-auth-token`;
+      return !!localStorage.getItem(sessionKey);
+    } catch (err) {
+      return false;
+    }
   }
 
   /**
@@ -53,6 +84,14 @@ export class AuthService {
    */
   logout(): void {
     const supabase = getSupabaseClient();
-    supabase.auth.signOut();
+    supabase.auth.signOut().then(() => {
+      // Clear any remaining localStorage items
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+    });
   }
 }
