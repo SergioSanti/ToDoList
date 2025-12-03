@@ -1,54 +1,54 @@
 <div class="container py-5">
   <main class="form-signin w-100 m-auto shadow-lg rounded-4 p-5 bg-body">
-    <form (ngSubmit)="realizarLogin()">
+    <form (ngSubmit)="performLogin()">
       <div class="text-center mb-4">
 
-        <h1 class="h4 mb-3 fw-normal">Acesse sua conta</h1>
-        <p class="text-body-secondary">Use seu usuário e senha para entrar</p>
+        <h1 class="h4 mb-3 fw-normal">Access your account</h1>
+        <p class="text-body-secondary">Use your username and password to sign in</p>
       </div>
 
       <div class="form-floating mb-3">
         <input
           type="text"
-          id="usuario"
+          id="user"
           class="form-control"
-          placeholder="Usuário"
-          [(ngModel)]="usuario"
-          name="usuario"
+          placeholder="User"
+          [(ngModel)]="user"
+          name="user"
           required
         />
-        <label for="usuario">Usuário</label>
+        <label for="user">User</label>
       </div>
 
       <div class="form-floating mb-3">
         <input
           type="password"
-          id="senha"
+          id="password"
           class="form-control"
-          placeholder="Senha"
-          [(ngModel)]="senha"
-          name="senha"
+          placeholder="Password"
+          [(ngModel)]="password"
+          name="password"
           required
         />
-        <label for="senha">Senha</label>
+        <label for="password">Password</label>
       </div>
 
       <button
         type="submit"
         class="btn btn-primary w-100 py-2 fw-semibold rounded-3"
       >
-        Entrar
+        Sign In
       </button>
 
-      @if (erro()) {
+      @if (error()) {
         <div class="mt-3 alert alert-danger" role="alert">
-          {{erro()}}
+          {{error()}}
         </div>
       }
 
       <p class="mt-4 mb-0 text-center">
         <a href="#" class="text-decoration-none text-secondary">
-          Esqueceu a senha?
+          Forgot password?
         </a>
       </p>
     </form>

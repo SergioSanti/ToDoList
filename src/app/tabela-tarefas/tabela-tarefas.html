@@ -1,47 +1,47 @@
 <div class="container">
-  <h2>Tabela de Tarefas</h2>
+  <h2>Tasks Table</h2>
 
-  <!-- FUNCIONALIDADE DE BUSCA/FILTRO COM PIPES -->
-  <!-- Campo de pesquisa que usa ngModel para busca em tempo real -->
+  <!-- SEARCH/FILTER FUNCTIONALITY WITH PIPES -->
+  <!-- Search field that uses ngModel for real-time search -->
   <div class="mb-3">
-    <label for="nomePesquisa" class="form-label">PESQUISA:</label>
-    <input type="text" [(ngModel)]="nomePesquisa" id="nomePesquisa" class="form-control" placeholder="Digite título para pesquisar...">
+    <label for="searchName" class="form-label">SEARCH:</label>
+    <input type="text" [(ngModel)]="searchName" id="searchName" class="form-control" placeholder="Type title to search...">
   </div>
 
-  <!-- Tabela com filtro aplicado via Pipe -->
-  @if((listaTarefas() | filtroPesquisa:nomePesquisa).length > 0) {
+  <!-- Table with filter applied via Pipe -->
+  @if((taskList() | searchFilter:searchName).length > 0) {
     <table class="table table-striped table-hover">
       <thead class="table-primary">
         <tr>
           <th>ID</th>
-          <th>TÍTULO</th>
-          <th>DESCRIÇÃO</th>
-          <th>CATEGORIA</th> <!-- RELACIONAMENTO: Mostra categoria da tarefa -->
-          <th>PRIORIDADE</th>
-          <th>CONCLUÍDA</th>
-          <th colspan="2">AÇÃO</th>
+          <th>TITLE</th>
+          <th>DESCRIPTION</th>
+          <th>CATEGORY</th> <!-- RELATIONSHIP: Shows task category -->
+          <th>PRIORITY</th>
+          <th>COMPLETED</th>
+          <th colspan="2">ACTION</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Loop com filtro aplicado via Pipe filtroPesquisa -->
-        @for(tarefa of listaTarefas() | filtroPesquisa:nomePesquisa; track tarefa.id) {
+        <!-- Loop with filter applied via searchFilter pipe -->
+        @for(task of taskList() | searchFilter:searchName; track task.id) {
           <tr>
-            <td>{{tarefa.id}}</td>
-            <td>{{tarefa.titulo}}</td>
-            <td>{{tarefa.descricao}}</td>
-            <!-- RELACIONAMENTO: Busca nome da categoria pelo ID -->
-            <td>{{getCategoriaNome(tarefa.categoriaId)}}</td>
-            <td>{{tarefa.prioridade}}</td>
-            <td>{{tarefa.concluida ? 'Sim' : 'Não'}}</td>
-            <!-- NAVEGAÇÃO SPA: RouterLink para edição -->
-            <td><a class="btn btn-primary" routerLink="/edit/{{tarefa.id}}">Editar</a></td>
-            <!-- CRUD: Operação de exclusão -->
-            <td><a class="btn btn-danger" (click)="deletar(tarefa.id)">Deletar</a></td>
+            <td>{{task.id}}</td>
+            <td>{{task.title}}</td>
+            <td>{{task.description}}</td>
+            <!-- RELATIONSHIP: Get category name by ID -->
+            <td>{{getCategoryName(task.categoryId)}}</td>
+            <td>{{task.priority}}</td>
+            <td>{{task.completed ? 'Yes' : 'No'}}</td>
+            <!-- SPA NAVIGATION: RouterLink for editing -->
+            <td><a class="btn btn-primary" routerLink="/edit/{{task.id}}">Edit</a></td>
+            <!-- CRUD: Delete operation -->
+            <td><a class="btn btn-danger" (click)="delete(task.id)">Delete</a></td>
           </tr>
         }
       </tbody>
     </table>
   } @else {
-    <h4>Não há tarefas cadastradas!</h4>
+    <h4>No tasks registered!</h4>
   }
 </div>

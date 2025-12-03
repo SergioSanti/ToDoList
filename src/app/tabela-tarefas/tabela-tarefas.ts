@@ -2,95 +2,95 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
-import { TarefasApiService } from '../tarefas-api-service';
-import { CategoriaApiService } from '../categoria-api-service';
-import { Tarefas } from '../tarefas';
-import { Categoria } from '../categoria';
-import { FiltroPesquisaPipe } from '../filtro-pesquisa-pipe';
+import { TasksApiService } from '../tasks-api-service';
+import { CategoriesApiService } from '../categories-api-service';
+import { Task } from '../tasks';
+import { Category } from '../category';
+import { SearchFilterPipe } from '../search-filter-pipe';
 import { filter } from 'rxjs/operators';
 
 /**
- * COMPONENTE TABELA DE TAREFAS - CRUD E RELACIONAMENTO
+ * TASKS TABLE COMPONENT - CRUD AND RELATIONSHIP
  * 
- * Este componente implementa:
- * - Exibição de tarefas em tabela
- * - Funcionalidade de busca/filtro usando Pipes
- * - Relacionamento entre Tarefas e Categorias
- * - Operações CRUD (Editar/Deletar)
- * - Navegação SPA entre telas
+ * This component implements:
+ * - Display tasks in table
+ * - Search/filter functionality using Pipes
+ * - Relationship between Tasks and Categories
+ * - CRUD operations (Edit/Delete)
+ * - SPA navigation between screens
  * 
  */
 @Component({
   selector: 'app-tabela-tarefas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FiltroPesquisaPipe],
+  imports: [CommonModule, FormsModule, RouterModule, SearchFilterPipe],
   templateUrl: './tabela-tarefas.html',
   styleUrls: ['./tabela-tarefas.css']
 })
 export class TabelaTarefas implements OnInit {
-  // Campo de pesquisa para filtro
-  nomePesquisa = '';
+  // Search field for filter
+  searchName = '';
   
-  // Signals para dados reativos
-  listaTarefas = signal<Tarefas[]>([]);
-  categorias = signal<Categoria[]>([]);
+  // Signals for reactive data
+  taskList = signal<Task[]>([]);
+  categories = signal<Category[]>([]);
   
-  // Injeção de dependências
-  private tarefasApiService = inject(TarefasApiService);
-  private categoriaApiService = inject(CategoriaApiService);
+  // Dependency injection
+  private tasksApiService = inject(TasksApiService);
+  private categoriesApiService = inject(CategoriesApiService);
   private router = inject(Router);
 
   constructor() {
-    // Escuta mudanças de rota para recarregar dados automaticamente
-    // FUNCIONALIDADE: Navegação SPA com atualização de dados
+    // Listen to route changes to reload data automatically
+    // FUNCTIONALITY: SPA navigation with data update
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
-      this.carregarDados();
+      this.loadData();
     });
   }
 
   ngOnInit() {
-    this.carregarDados();
+    this.loadData();
   }
 
   /**
-   * Carrega dados das duas entidades relacionadas
-   * FUNCIONALIDADE: Manipulação de duas entidades simultaneamente
-   * RELACIONAMENTO: Tarefas e Categorias
+   * Load data from both related entities
+   * FUNCTIONALITY: Manipulate two entities simultaneously
+   * RELATIONSHIP: Tasks and Categories
    */
-  carregarDados() {
-    // Carrega tarefas
-    this.tarefasApiService.listar().subscribe((tarefas) => {
-      this.listaTarefas.set(tarefas);
+  loadData() {
+    // Load tasks
+    this.tasksApiService.list().subscribe((tasks) => {
+      this.taskList.set(tasks);
     });
     
-    // Carrega categorias para relacionamento
-    this.categoriaApiService.listar().subscribe((categorias) => {
-      this.categorias.set(categorias);
+    // Load categories for relationship
+    this.categoriesApiService.list().subscribe((categories) => {
+      this.categories.set(categories);
     });
   }
 
   /**
-   * DELETE - Remove tarefa
-   * CRUD: Operação de Exclusão
+   * DELETE - Remove task
+   * CRUD: Delete operation
    */
-  deletar(id: number) {
-    if (confirm('Tem certeza que deseja deletar esta tarefa?')) {
-      this.tarefasApiService.deletar(id).subscribe(() => {
-        // Atualiza lista local após exclusão
-        this.listaTarefas.set(this.listaTarefas().filter(t => t.id !== id));
+  delete(id: number) {
+    if (confirm('Are you sure you want to delete this task?')) {
+      this.tasksApiService.delete(id).subscribe(() => {
+        // Update local list after deletion
+        this.taskList.set(this.taskList().filter(t => t.id !== id));
       });
     }
   }
 
   /**
-   * Busca nome da categoria pelo ID
-   * FUNCIONALIDADE: Relacionamento entre duas entidades
-   * RELACIONAMENTO: Tarefas → Categorias (categoriaId)
+   * Get category name by ID
+   * FUNCTIONALITY: Relationship between two entities
+   * RELATIONSHIP: Tasks → Categories (categoryId)
    */
-  getCategoriaNome(categoriaId: number): string {
-    const categoria = this.categorias().find(c => c.id === categoriaId);
-    return categoria ? categoria.nome : 'Sem categoria';
+  getCategoryName(categoryId: number): string {
+    const category = this.categories().find(c => c.id === categoryId);
+    return category ? category.name : 'No category';
   }
 }

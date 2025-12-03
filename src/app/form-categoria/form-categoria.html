@@ -1,46 +1,46 @@
 <div class="container mt-4">
-  <h2>{{botaoAcao}} Categoria</h2>
+  <h2>{{actionButton}} Category</h2>
   
-  <form (ngSubmit)="salvar()">
-    <!-- VALIDAÇÃO: Campos obrigatórios com feedback visual -->
+  <form (ngSubmit)="save()">
+    <!-- VALIDATION: Required fields with visual feedback -->
     <div class="mb-3">
-      <label for="nome" class="form-label">Nome: <span class="text-danger">*</span></label>
+      <label for="name" class="form-label">Name: <span class="text-danger">*</span></label>
       <input 
         type="text" 
-        [(ngModel)]="categoria().nome" 
-        id="nome" 
-        name="nome" 
+        [(ngModel)]="category().name" 
+        id="name" 
+        name="name" 
         class="form-control"
-        [class.is-invalid]="erros()['nome']"
+        [class.is-invalid]="errors()['name']"
         required>
-      @if (erros()['nome']) {
-        <div class="invalid-feedback">{{erros()['nome']}}</div>
+      @if (errors()['name']) {
+        <div class="invalid-feedback">{{errors()['name']}}</div>
       }
     </div>
 
     <div class="mb-3">
-      <label for="descricao" class="form-label">Descrição: <span class="text-danger">*</span></label>
+      <label for="description" class="form-label">Description: <span class="text-danger">*</span></label>
       <textarea 
-        [(ngModel)]="categoria().descricao" 
-        id="descricao" 
-        name="descricao" 
+        [(ngModel)]="category().description" 
+        id="description" 
+        name="description" 
         class="form-control"
-        [class.is-invalid]="erros()['descricao']"
+        [class.is-invalid]="errors()['description']"
         rows="3"
         required></textarea>
-      @if (erros()['descricao']) {
-        <div class="invalid-feedback">{{erros()['descricao']}}</div>
+      @if (errors()['description']) {
+        <div class="invalid-feedback">{{errors()['description']}}</div>
       }
     </div>
 
     <div class="mb-3">
-      <label for="cor" class="form-label">Cor:</label>
-      <input type="color" [(ngModel)]="categoria().cor" id="cor" name="cor" class="form-control form-control-color">
+      <label for="color" class="form-label">Color:</label>
+      <input type="color" [(ngModel)]="category().color" id="color" name="color" class="form-control form-control-color">
     </div>
 
     <div class="mb-3">
-      <button type="submit" class="btn btn-primary me-2">{{botaoAcao}}</button>
-      <button type="button" class="btn btn-secondary" (click)="voltar()">Voltar</button>
+      <button type="submit" class="btn btn-primary me-2">{{actionButton}}</button>
+      <button type="button" class="btn btn-secondary" (click)="goBack()">Back</button>
     </div>
   </form>
 </div>

@@ -2,8 +2,8 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { CategoriaApiService } from '../categoria-api-service';
-import { Categoria } from '../categoria';
+import { CategoriesApiService } from '../categories-api-service';
+import { Category } from '../category';
 
 @Component({
   selector: 'app-tabela-categoria',
@@ -13,36 +13,36 @@ import { Categoria } from '../categoria';
   styleUrls: ['./tabela-categoria.css']
 })
 export class TabelaCategoria {
-  listaCategorias = signal<Categoria[]>([]);
-  private categoriaApiService = inject(CategoriaApiService);
+  categoryList = signal<Category[]>([]);
+  private categoriesApiService = inject(CategoriesApiService);
 
   constructor() {
-    this.categoriaApiService.listar().subscribe((categorias) => {
-      this.listaCategorias.set(categorias);
+    this.categoriesApiService.list().subscribe((categories) => {
+      this.categoryList.set(categories);
     });
   }
 
-  deletar(id: number) {
-    if (confirm('Tem certeza que deseja deletar esta categoria?')) {
-      this.categoriaApiService.deletar(id).subscribe(() => {
-        this.listaCategorias.set(this.listaCategorias().filter(c => c.id !== id));
+  delete(id: number) {
+    if (confirm('Are you sure you want to delete this category?')) {
+      this.categoriesApiService.delete(id).subscribe(() => {
+        this.categoryList.set(this.categoryList().filter(c => c.id !== id));
       });
     }
   }
 
   getContrastColor(hexColor: string): string {
-    // Remove o # se presente
+    // Remove # if present
     const color = hexColor.replace('#', '');
     
-    // Converte para RGB
+    // Convert to RGB
     const r = parseInt(color.substr(0, 2), 16);
     const g = parseInt(color.substr(2, 2), 16);
     const b = parseInt(color.substr(4, 2), 16);
     
-    // Calcula o brilho
+    // Calculate brightness
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
     
-    // Retorna branco para cores escuras, preto para cores claras
+    // Return white for dark colors, black for light colors
     return brightness > 128 ? '#000000' : '#ffffff';
   }
 }

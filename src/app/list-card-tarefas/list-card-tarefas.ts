@@ -1,19 +1,19 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TarefasApiService } from '../tarefas-api-service';
-import { CategoriaApiService } from '../categoria-api-service';
-import { Tarefas } from '../tarefas';
-import { Categoria } from '../categoria';
+import { TasksApiService } from '../tasks-api-service';
+import { CategoriesApiService } from '../categories-api-service';
+import { Task } from '../tasks';
+import { Category } from '../category';
 
 /**
- * COMPONENTE LISTA DE TAREFAS - RELACIONAMENTO E FUNCIONALIDADE DE NEGÓCIO
+ * TASK LIST COMPONENT - RELATIONSHIP AND BUSINESS FUNCTIONALITY
  * 
- * Este componente implementa:
- * - Exibição de tarefas em cards visuais
- * - Relacionamento entre Tarefas e Categorias
- * - Funcionalidade de negócio: exibição integrada
- * - Manipulação de duas entidades simultaneamente
- * - Cálculo de cores de contraste
+ * This component implements:
+ * - Display tasks in visual cards
+ * - Relationship between Tasks and Categories
+ * - Business functionality: integrated display
+ * - Manipulate two entities simultaneously
+ * - Calculate contrast colors
  */
 @Component({
   selector: 'app-list-card-tarefas',
@@ -23,58 +23,58 @@ import { Categoria } from '../categoria';
   styleUrls: ['./list-card-tarefas.css']
 })
 export class ListCardTarefas {
-  // Signals para dados reativos
-  tarefas = signal<Tarefas[]>([]);
-  categorias = signal<Categoria[]>([]);
+  // Signals for reactive data
+  tasks = signal<Task[]>([]);
+  categories = signal<Category[]>([]);
   
-  // Injeção de dependências
-  private tarefasApiService = inject(TarefasApiService);
-  private categoriaApiService = inject(CategoriaApiService);
+  // Dependency injection
+  private tasksApiService = inject(TasksApiService);
+  private categoriesApiService = inject(CategoriesApiService);
 
   constructor() {
-    this.carregarDados();
+    this.loadData();
   }
 
   /**
-   * Carrega dados das duas entidades relacionadas
-   * FUNCIONALIDADE: Manipulação de duas entidades simultaneamente
-   * RELACIONAMENTO: Tarefas e Categorias
+   * Load data from both related entities
+   * FUNCTIONALITY: Manipulate two entities simultaneously
+   * RELATIONSHIP: Tasks and Categories
    */
-  carregarDados() {
-    // Carrega tarefas
-    this.tarefasApiService.listar().subscribe(tarefas => {
-      this.tarefas.set(tarefas);
+  loadData() {
+    // Load tasks
+    this.tasksApiService.list().subscribe(tasks => {
+      this.tasks.set(tasks);
     });
     
-    // Carrega categorias para relacionamento
-    this.categoriaApiService.listar().subscribe(categorias => {
-      this.categorias.set(categorias);
+    // Load categories for relationship
+    this.categoriesApiService.list().subscribe(categories => {
+      this.categories.set(categories);
     });
   }
 
   /**
-   * Busca nome da categoria pelo ID
-   * FUNCIONALIDADE: Relacionamento entre duas entidades
-   * RELACIONAMENTO: Tarefas → Categorias (categoriaId)
+   * Get category name by ID
+   * FUNCTIONALITY: Relationship between two entities
+   * RELATIONSHIP: Tasks → Categories (categoryId)
    */
-  getCategoriaNome(categoriaId: number): string {
-    const categoria = this.categorias().find(c => c.id === categoriaId);
-    return categoria ? categoria.nome : 'Sem categoria';
+  getCategoryName(categoryId: number): string {
+    const category = this.categories().find(c => c.id === categoryId);
+    return category ? category.name : 'No category';
   }
 
   /**
-   * Busca cor da categoria pelo ID
-   * FUNCIONALIDADE: Relacionamento entre duas entidades
-   * RELACIONAMENTO: Tarefas → Categorias (categoriaId)
+   * Get category color by ID
+   * FUNCTIONALITY: Relationship between two entities
+   * RELATIONSHIP: Tasks → Categories (categoryId)
    */
-  getCategoriaCor(categoriaId: number): string {
-    const categoria = this.categorias().find(c => c.id === categoriaId);
-    return categoria ? categoria.cor : '#6c757d';
+  getCategoryColor(categoryId: number): string {
+    const category = this.categories().find(c => c.id === categoryId);
+    return category ? category.color : '#6c757d';
   }
 
   /**
-   * FUNCIONALIDADE DE NEGÓCIO: Calcula cor de contraste
-   * Calcula se deve usar texto branco ou preto baseado na cor de fundo
+   * BUSINESS FUNCTIONALITY: Calculate contrast color
+   * Calculates whether to use white or black text based on background color
    */
   getContrastColor(hexColor: string): string {
     const color = hexColor.replace('#', '');

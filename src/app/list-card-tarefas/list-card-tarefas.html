@@ -1,44 +1,44 @@
 <div class="container mt-4">
-  <h2 class="mb-4 text-center">Lista Completa de Tarefas</h2>
+  <h2 class="mb-4 text-center">Complete Task List</h2>
 
-  <!-- FUNCIONALIDADE DE NEGÓCIO: Exibição integrada com relacionamento -->
+  <!-- BUSINESS FUNCTIONALITY: Integrated display with relationship -->
   <div class="row gy-3">
-    @for (tarefa of tarefas(); track tarefa.id) {
+    @for (task of tasks(); track task.id) {
       <div class="col-md-4">
-        <!-- RELACIONAMENTO: Card com cor da categoria -->
-        <div class="card shadow" [style.border-left]="'5px solid ' + getCategoriaCor(tarefa.categoriaId)">
+        <!-- RELATIONSHIP: Card with category color -->
+        <div class="card shadow" [style.border-left]="'5px solid ' + getCategoryColor(task.categoryId)">
           <div class="card-body">
-            <h5 class="card-title">{{ tarefa.titulo }}</h5>
-            <p class="card-text">{{ tarefa.descricao }}</p>
+            <h5 class="card-title">{{ task.title }}</h5>
+            <p class="card-text">{{ task.description }}</p>
             
-            <!-- RELACIONAMENTO: Exibe categoria com cor personalizada -->
+            <!-- RELATIONSHIP: Display category with custom color -->
             <div class="mb-2">
-              <strong>Categoria:</strong> 
-              <span class="badge" [style.background-color]="getCategoriaCor(tarefa.categoriaId)" [style.color]="getContrastColor(getCategoriaCor(tarefa.categoriaId))">
-                {{ getCategoriaNome(tarefa.categoriaId) }}
+              <strong>Category:</strong> 
+              <span class="badge" [style.background-color]="getCategoryColor(task.categoryId)" [style.color]="getContrastColor(getCategoryColor(task.categoryId))">
+                {{ getCategoryName(task.categoryId) }}
               </span>
             </div>
             
-            <!-- FUNCIONALIDADE DE NEGÓCIO: Badges com cores baseadas em prioridade -->
+            <!-- BUSINESS FUNCTIONALITY: Badges with colors based on priority -->
             <div class="row">
               <div class="col-6">
                 <p class="card-text mb-1">
-                  <strong>Prioridade:</strong> 
+                  <strong>Priority:</strong> 
                   <span class="badge" [ngClass]="{
-                    'bg-danger': tarefa.prioridade >= 4,
-                    'bg-warning': tarefa.prioridade === 3,
-                    'bg-info': tarefa.prioridade === 2,
-                    'bg-success': tarefa.prioridade === 1
+                    'bg-danger': task.priority >= 4,
+                    'bg-warning': task.priority === 3,
+                    'bg-info': task.priority === 2,
+                    'bg-success': task.priority === 1
                   }">
-                    {{ tarefa.prioridade }}
+                    {{ task.priority }}
                   </span>
                 </p>
               </div>
               <div class="col-6">
                 <p class="card-text mb-1">
                   <strong>Status:</strong> 
-                  <span class="badge" [ngClass]="tarefa.concluida ? 'bg-success' : 'bg-secondary'">
-                    {{ tarefa.concluida ? 'Concluída' : 'Pendente' }}
+                  <span class="badge" [ngClass]="task.completed ? 'bg-success' : 'bg-secondary'">
+                    {{ task.completed ? 'Completed' : 'Pending' }}
                   </span>
                 </p>
               </div>
@@ -47,7 +47,7 @@
         </div>
       </div>
     } @empty {
-      <p class="text-center text-muted">Nenhuma tarefa cadastrada.</p>
+      <p class="text-center text-muted">No tasks registered.</p>
     }
   </div>
 </div>

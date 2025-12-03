@@ -1,19 +1,19 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { TarefasApiService } from '../tarefas-api-service';
-import { CategoriaApiService } from '../categoria-api-service';
-import { Tarefas } from '../tarefas';
-import { Categoria } from '../categoria';
+import { TasksApiService } from '../tasks-api-service';
+import { CategoriesApiService } from '../categories-api-service';
+import { Task } from '../tasks';
+import { Category } from '../category';
 
 /**
- * COMPONENTE DASHBOARD - PÁGINA PRINCIPAL
+ * DASHBOARD COMPONENT - MAIN PAGE
  * 
- * Este componente implementa:
- * - Visualização de todas as tarefas (ativas e excluídas)
- * - Estatísticas e resumo das tarefas
- * - Separação entre tarefas ativas e excluídas
- * - Relacionamento com Categorias
+ * This component implements:
+ * - View all tasks (active and deleted)
+ * - Statistics and task summary
+ * - Separation between active and deleted tasks
+ * - Relationship with Categories
  */
 @Component({
   selector: 'app-dashboard',
@@ -23,88 +23,88 @@ import { Categoria } from '../categoria';
   styleUrls: ['./dashboard.css']
 })
 export class Dashboard implements OnInit {
-  // Signals para dados reativos
-  todasTarefas = signal<Tarefas[]>([]);
-  tarefasAtivas = signal<Tarefas[]>([]);
-  tarefasExcluidas = signal<Tarefas[]>([]);
-  categorias = signal<Categoria[]>([]);
+  // Signals for reactive data
+  allTasks = signal<Task[]>([]);
+  activeTasks = signal<Task[]>([]);
+  deletedTasks = signal<Task[]>([]);
+  categories = signal<Category[]>([]);
   
-  // Estatísticas
-  totalTarefas = signal<number>(0);
-  totalAtivas = signal<number>(0);
-  totalExcluidas = signal<number>(0);
-  totalConcluidas = signal<number>(0);
-  totalPendentes = signal<number>(0);
+  // Statistics
+  totalTasks = signal<number>(0);
+  totalActive = signal<number>(0);
+  totalDeleted = signal<number>(0);
+  totalCompleted = signal<number>(0);
+  totalPending = signal<number>(0);
 
-  // Injeção de dependências
-  private tarefasApiService = inject(TarefasApiService);
-  private categoriaApiService = inject(CategoriaApiService);
+  // Dependency injection
+  private tasksApiService = inject(TasksApiService);
+  private categoriesApiService = inject(CategoriesApiService);
 
   ngOnInit() {
-    this.carregarDados();
+    this.loadData();
   }
 
   /**
-   * Carrega todos os dados do dashboard
+   * Load all dashboard data
    */
-  carregarDados() {
-    // Carrega todas as tarefas (incluindo excluídas)
-    this.tarefasApiService.listarTodas().subscribe((tarefas) => {
-      this.todasTarefas.set(tarefas);
+  loadData() {
+    // Load all tasks (including deleted)
+    this.tasksApiService.listAll().subscribe((tasks) => {
+      this.allTasks.set(tasks);
       
-      // Separa tarefas ativas e excluídas
-      const ativas = tarefas.filter(t => !t.excluida);
-      const excluidas = tarefas.filter(t => t.excluida);
+      // Separate active and deleted tasks
+      const active = tasks.filter(t => !t.deleted);
+      const deleted = tasks.filter(t => t.deleted);
       
-      this.tarefasAtivas.set(ativas);
-      this.tarefasExcluidas.set(excluidas);
+      this.activeTasks.set(active);
+      this.deletedTasks.set(deleted);
       
-      // Calcula estatísticas
-      this.totalTarefas.set(tarefas.length);
-      this.totalAtivas.set(ativas.length);
-      this.totalExcluidas.set(excluidas.length);
-      this.totalConcluidas.set(ativas.filter(t => t.concluida).length);
-      this.totalPendentes.set(ativas.filter(t => !t.concluida).length);
+      // Calculate statistics
+      this.totalTasks.set(tasks.length);
+      this.totalActive.set(active.length);
+      this.totalDeleted.set(deleted.length);
+      this.totalCompleted.set(active.filter(t => t.completed).length);
+      this.totalPending.set(active.filter(t => !t.completed).length);
     });
 
-    // Carrega categorias para relacionamento
-    this.categoriaApiService.listar().subscribe((categorias) => {
-      this.categorias.set(categorias);
+    // Load categories for relationship
+    this.categoriesApiService.list().subscribe((categories) => {
+      this.categories.set(categories);
     });
   }
 
   /**
-   * Busca nome da categoria pelo ID
-   * RELACIONAMENTO: Tarefas → Categorias
+   * Get category name by ID
+   * RELATIONSHIP: Tasks → Categories
    */
-  getCategoriaNome(categoriaId: number): string {
-    const categoria = this.categorias().find(c => c.id === categoriaId);
-    return categoria ? categoria.nome : 'Sem categoria';
+  getCategoryName(categoryId: number): string {
+    const category = this.categories().find(c => c.id === categoryId);
+    return category ? category.name : 'No category';
   }
 
   /**
-   * Restaura tarefa excluída
+   * Restore deleted task
    */
-  restaurarTarefa(id: number) {
-    if (confirm('Deseja restaurar esta tarefa?')) {
-      this.tarefasApiService.restaurar(id).subscribe(() => {
-        this.carregarDados();
+  restoreTask(id: number) {
+    if (confirm('Do you want to restore this task?')) {
+      this.tasksApiService.restore(id).subscribe(() => {
+        this.loadData();
       });
     }
   }
 
   /**
-   * Busca cor da categoria pelo ID
-   * RELACIONAMENTO: Tarefas → Categorias
+   * Get category color by ID
+   * RELATIONSHIP: Tasks → Categories
    */
-  getCategoriaCor(categoriaId: number): string {
-    const categoria = this.categorias().find(c => c.id === categoriaId);
-    return categoria ? categoria.cor : '#6c757d';
+  getCategoryColor(categoryId: number): string {
+    const category = this.categories().find(c => c.id === categoryId);
+    return category ? category.color : '#6c757d';
   }
 
   /**
-   * Calcula cor de contraste para texto
-   * FUNCIONALIDADE DE NEGÓCIO: Calcula se deve usar texto branco ou preto
+   * Calculate contrast color for text
+   * BUSINESS FUNCTIONALITY: Calculates whether to use white or black text
    */
   getContrastColor(hexColor: string): string {
     const color = hexColor.replace('#', '');
@@ -116,13 +116,12 @@ export class Dashboard implements OnInit {
   }
 
   /**
-   * Obtém classe CSS para prioridade
+   * Get CSS class for priority
    */
-  getPrioridadeClass(prioridade: number): string {
-    if (prioridade >= 4) return 'badge bg-danger';
-    if (prioridade >= 3) return 'badge bg-warning';
-    if (prioridade === 2) return 'badge bg-info';
+  getPriorityClass(priority: number): string {
+    if (priority >= 4) return 'badge bg-danger';
+    if (priority >= 3) return 'badge bg-warning';
+    if (priority === 2) return 'badge bg-info';
     return 'badge bg-success';
   }
 }
-

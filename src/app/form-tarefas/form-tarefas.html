@@ -1,97 +1,97 @@
 <div class="container mt-4">
-  <h2>Formulário de Tarefas</h2>
+  <h2>Task Form</h2>
   <div>
-    <!-- CRUD: Campos para criação/edição de tarefas -->
-    <!-- VALIDAÇÃO: Campos obrigatórios com feedback visual -->
+    <!-- CRUD: Fields for creating/editing tasks -->
+    <!-- VALIDATION: Required fields with visual feedback -->
     <div class="mb-3">
-      <label for="titulo" class="form-label">Título: <span class="text-danger">*</span></label>
+      <label for="title" class="form-label">Title: <span class="text-danger">*</span></label>
       <input 
         type="text" 
-        [(ngModel)]="tarefas().titulo" 
-        id="titulo" 
-        name="titulo"
+        [(ngModel)]="task().title" 
+        id="title" 
+        name="title"
         class="form-control" 
-        [class.is-invalid]="erros()['titulo']"
-        placeholder="Digite o título"
+        [class.is-invalid]="errors()['title']"
+        placeholder="Enter title"
         required>
-      @if (erros()['titulo']) {
-        <div class="invalid-feedback">{{erros()['titulo']}}</div>
+      @if (errors()['title']) {
+        <div class="invalid-feedback">{{errors()['title']}}</div>
       }
     </div>
 
     <div class="mb-3">
-      <label for="descricao" class="form-label">Descrição: <span class="text-danger">*</span></label>
+      <label for="description" class="form-label">Description: <span class="text-danger">*</span></label>
       <textarea 
-        [(ngModel)]="tarefas().descricao" 
-        id="descricao" 
-        name="descricao"
+        [(ngModel)]="task().description" 
+        id="description" 
+        name="description"
         class="form-control" 
-        [class.is-invalid]="erros()['descricao']"
-        placeholder="Digite a descrição"
+        [class.is-invalid]="errors()['description']"
+        placeholder="Enter description"
         rows="3"
         required></textarea>
-      @if (erros()['descricao']) {
-        <div class="invalid-feedback">{{erros()['descricao']}}</div>
+      @if (errors()['description']) {
+        <div class="invalid-feedback">{{errors()['description']}}</div>
       }
     </div>
 
-    <!-- RELACIONAMENTO: Select que conecta Tarefas com Categorias -->
-    <!-- FUNCIONALIDADE: Manipulação de duas entidades simultaneamente -->
+    <!-- RELATIONSHIP: Select that connects Tasks with Categories -->
+    <!-- FUNCTIONALITY: Manipulate two entities simultaneously -->
     <div class="mb-3">
-      <label for="categoria" class="form-label">Categoria: <span class="text-danger">*</span></label>
+      <label for="category" class="form-label">Category: <span class="text-danger">*</span></label>
       <select 
-        [(ngModel)]="tarefas().categoriaId" 
-        id="categoria" 
-        name="categoria"
+        [(ngModel)]="task().categoryId" 
+        id="category" 
+        name="category"
         class="form-control"
-        [class.is-invalid]="erros()['categoria']"
+        [class.is-invalid]="errors()['category']"
         required>
-        <option value="">Selecione uma categoria</option>
-        @for(categoria of categorias(); track categoria.id) {
-          <option [value]="categoria.id.toString()">{{categoria.nome}}</option>
+        <option value="">Select a category</option>
+        @for(category of categories(); track category.id) {
+          <option [value]="category.id.toString()">{{category.name}}</option>
         }
       </select>
-      @if (erros()['categoria']) {
-        <div class="invalid-feedback">{{erros()['categoria']}}</div>
+      @if (errors()['category']) {
+        <div class="invalid-feedback">{{errors()['category']}}</div>
       }
     </div>
 
     <div class="mb-3">
-      <label for="prioridade" class="form-label">Prioridade (1-5): <span class="text-danger">*</span></label>
+      <label for="priority" class="form-label">Priority (1-5): <span class="text-danger">*</span></label>
       <input 
         type="number" 
-        [(ngModel)]="tarefas().prioridade" 
-        id="prioridade" 
-        name="prioridade"
+        [(ngModel)]="task().priority" 
+        id="priority" 
+        name="priority"
         class="form-control" 
-        [class.is-invalid]="erros()['prioridade']"
+        [class.is-invalid]="errors()['priority']"
         min="1" 
         max="5"
         placeholder="1-5"
         required>
-      @if (erros()['prioridade']) {
-        <div class="invalid-feedback">{{erros()['prioridade']}}</div>
+      @if (errors()['priority']) {
+        <div class="invalid-feedback">{{errors()['priority']}}</div>
       }
-      <small class="form-text text-muted">Digite um valor entre 1 (menor) e 5 (maior prioridade)</small>
+      <small class="form-text text-muted">Enter a value between 1 (lowest) and 5 (highest priority)</small>
     </div>
 
     <div class="mb-3">
       <div class="form-check">
         <input 
           type="checkbox" 
-          [(ngModel)]="tarefas().concluida" 
-          id="concluida"
-          name="concluida"
+          [(ngModel)]="task().completed" 
+          id="completed"
+          name="completed"
           class="form-check-input">
-        <label class="form-check-label" for="concluida">
-          Concluída
+        <label class="form-check-label" for="completed">
+          Completed
         </label>
       </div>
     </div>
 
-    <!-- CRUD: Botões para salvar (Create/Update) -->
-    <button class="btn btn-primary me-3" (click)="salvar()">{{botaoAcao}}</button>
-    <!-- NAVEGAÇÃO SPA: Botão para voltar -->
-    <button class="btn btn-secondary" (click)="voltar()">Voltar</button>
+    <!-- CRUD: Buttons to save (Create/Update) -->
+    <button class="btn btn-primary me-3" (click)="save()">{{actionButton}}</button>
+    <!-- SPA NAVIGATION: Button to go back -->
+    <button class="btn btn-secondary" (click)="goBack()">Back</button>
   </div>
 </div>

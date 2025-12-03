@@ -1,9 +1,9 @@
 <div class="card shadow">
   <div class="card-body">
-    <h5 class="card-title">{{tarefa.titulo}}</h5>
-    <p class="card-text">{{tarefa.descricao}}</p>
-    <p class="card-text"><strong>Categoria:</strong> {{ getCategoriaNome(tarefa.categoriaId) }}</p>
-    <p class="card-text"><strong>Prioridade:</strong> {{tarefa.prioridade}}</p>
-    <p class="card-text"><strong>Status:</strong> {{tarefa.concluida ? 'Concluída' : 'Pendente'}}</p>
+    <h5 class="card-title">{{task.title}}</h5>
+    <p class="card-text">{{task.description}}</p>
+    <p class="card-text"><strong>Category:</strong> {{ getCategoryName(task.categoryId) }}</p>
+    <p class="card-text"><strong>Priority:</strong> {{task.priority}}</p>
+    <p class="card-text"><strong>Status:</strong> {{task.completed ? 'Completed' : 'Pending'}}</p>
   </div>
 </div>

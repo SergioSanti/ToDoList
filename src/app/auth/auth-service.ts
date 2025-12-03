@@ -3,12 +3,12 @@ import { from, map, Observable } from 'rxjs';
 import { getSupabaseClient } from '../supabase-client';
 
 /**
- * SERVIÇO DE AUTENTICAÇÃO COM SUPABASE AUTH
+ * AUTHENTICATION SERVICE WITH SUPABASE AUTH
  *
- * Responsável por:
- * - Login com e-mail e senha (Serverless Authentication)
- * - Manter sessão autenticada (persistSession: true)
- * - Verificar se usuário está logado
+ * Responsible for:
+ * - Login with email and password (Serverless Authentication)
+ * - Maintain authenticated session (persistSession: true)
+ * - Check if user is logged in
  * - Logout
  */
 @Injectable({
@@ -17,15 +17,15 @@ import { getSupabaseClient } from '../supabase-client';
 export class AuthService {
 
   /**
-   * LOGIN - Utiliza Supabase Authentication (email/senha)
+   * LOGIN - Uses Supabase Authentication (email/password)
    */
-  login(email: string, senha: string): Observable<boolean> {
+  login(email: string, password: string): Observable<boolean> {
     const supabase = getSupabaseClient();
 
     return from(
       supabase.auth.signInWithPassword({
         email,
-        password: senha
+        password: password
       })
     ).pipe(
       map(result => {
@@ -35,25 +35,24 @@ export class AuthService {
   }
 
   /**
-   * VERIFICAÇÃO DE LOGIN
-   * Usa a sessão mantida pelo Supabase.
+   * LOGIN CHECK
+   * Uses the session maintained by Supabase.
    */
-  estaLogado(): boolean {
+  isLoggedIn(): boolean {
     const supabase = getSupabaseClient();
     const session = supabase.auth.getSession();
-    // getSession() retorna uma Promise, então aqui fazemos uma verificação simples
-    // baseada em storage interno do Supabase (persistSession).
-    // Para o RouteGuard (sincrono), usamos a existência do item no localStorage.
-    const hasSupabaseAuthStorage = !!localStorage.getItem('sb-' /* prefixo padrão */);
+    // getSession() returns a Promise, so here we do a simple check
+    // based on Supabase internal storage (persistSession).
+    // For RouteGuard (synchronous), we use the existence of the item in localStorage.
+    const hasSupabaseAuthStorage = !!localStorage.getItem('sb-' /* default prefix */);
     return hasSupabaseAuthStorage;
   }
 
   /**
-   * LOGOUT - Encerra sessão no Supabase e limpa dados locais
+   * LOGOUT - Ends Supabase session and clears local data
    */
   logout(): void {
     const supabase = getSupabaseClient();
     supabase.auth.signOut();
   }
 }
-

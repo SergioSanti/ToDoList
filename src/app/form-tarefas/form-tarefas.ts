@@ -1,20 +1,20 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Tarefas } from '../tarefas';
-import { TarefasApiService } from '../tarefas-api-service';
-import { CategoriaApiService } from '../categoria-api-service';
-import { Categoria } from '../categoria';
+import { Task } from '../tasks';
+import { TasksApiService } from '../tasks-api-service';
+import { CategoriesApiService } from '../categories-api-service';
+import { Category } from '../category';
 
 /**
- * COMPONENTE FORMULÁRIO DE TAREFAS - CRUD E RELACIONAMENTO
+ * TASK FORM COMPONENT - CRUD AND RELATIONSHIP
  * 
- * Este componente implementa:
- * - Formulário para criar/editar tarefas
- * - Relacionamento com entidade Categorias
- * - Operações CRUD (Create/Update)
- * - Navegação SPA entre telas
- * - Validação de tipos (string/number)
+ * This component implements:
+ * - Form to create/edit tasks
+ * - Relationship with Category entity
+ * - CRUD operations (Create/Update)
+ * - SPA navigation between screens
+ * - Type validation (string/number)
  * 
  */
 @Component({
@@ -25,117 +25,117 @@ import { Categoria } from '../categoria';
 })
 export class FormTarefas {
   id?: number;
-  // Signal para dados reativos da tarefa
-  tarefas = signal<Tarefas>({ id:0, titulo:'', descricao:'', prioridade:1, concluida:false, categoriaId: 1 });
-  botaoAcao = "Cadastrar";
-  // Signal para categorias relacionadas
-  categorias = signal<Categoria[]>([]);
-  // Validações
-  erros = signal<{[key: string]: string}>({});
+  // Signal for reactive task data
+  task = signal<Task>({ id:0, title:'', description:'', priority:1, completed:false, categoryId: 1 });
+  actionButton = "Register";
+  // Signal for related categories
+  categories = signal<Category[]>([]);
+  // Validations
+  errors = signal<{[key: string]: string}>({});
 
-  // Injeção de dependências
-  tarefasApiService = inject(TarefasApiService);
-  categoriaApiService = inject(CategoriaApiService);
+  // Dependency injection
+  tasksApiService = inject(TasksApiService);
+  categoriesApiService = inject(CategoriesApiService);
   route = inject(ActivatedRoute);
   router = inject(Router);
 
   constructor() {
-    // NAVEGAÇÃO SPA: Captura ID da rota para edição
+    // SPA NAVIGATION: Capture route ID for editing
     const idParam = this.route.snapshot.params['id'];
     this.id = idParam ? +idParam : undefined;
     
     if(this.id) {
-      this.botaoAcao = "Editar";
-      // CRUD: Operação de Leitura para edição
-      this.tarefasApiService.buscarPorId(this.id).subscribe(t => {
-        this.tarefas.set(t);
+      this.actionButton = "Edit";
+      // CRUD: Read operation for editing
+      this.tasksApiService.findById(this.id).subscribe(t => {
+        this.task.set(t);
       });
     }
     
-    // RELACIONAMENTO: Carrega categorias para o select
-    // FUNCIONALIDADE: Manipulação de duas entidades simultaneamente
-    this.categoriaApiService.listar().subscribe(categorias => {
-      this.categorias.set(categorias);
-      // Se não há ID (criação) e há categorias, define a primeira como padrão
-      if (!this.id && categorias.length > 0 && this.tarefas().categoriaId <= 0) {
-        this.tarefas.update(t => ({ ...t, categoriaId: categorias[0].id }));
+    // RELATIONSHIP: Load categories for select
+    // FUNCTIONALITY: Manipulate two entities simultaneously
+    this.categoriesApiService.list().subscribe(categories => {
+      this.categories.set(categories);
+      // If there's no ID (creation) and there are categories, set the first as default
+      if (!this.id && categories.length > 0 && this.task().categoryId <= 0) {
+        this.task.update(t => ({ ...t, categoryId: categories[0].id }));
       }
     });
   }
 
   /**
-   * Valida os campos do formulário
-   * VALIDAÇÃO: Campos obrigatórios e regras de negócio
+   * Validate form fields
+   * VALIDATION: Required fields and business rules
    */
-  validar(): boolean {
-    const erros: {[key: string]: string} = {};
-    const tarefa = this.tarefas();
+  validate(): boolean {
+    const errors: {[key: string]: string} = {};
+    const task = this.task();
 
-    // Validação: Título obrigatório
-    if (!tarefa.titulo || tarefa.titulo.trim() === '') {
-      erros['titulo'] = 'Título é obrigatório';
+    // Validation: Title required
+    if (!task.title || task.title.trim() === '') {
+      errors['title'] = 'Title is required';
     }
 
-    // Validação: Descrição obrigatória
-    if (!tarefa.descricao || tarefa.descricao.trim() === '') {
-      erros['descricao'] = 'Descrição é obrigatória';
+    // Validation: Description required
+    if (!task.description || task.description.trim() === '') {
+      errors['description'] = 'Description is required';
     }
 
-    // Validação: Categoria obrigatória
-    if (!tarefa.categoriaId || tarefa.categoriaId <= 0) {
-      erros['categoria'] = 'Categoria é obrigatória';
+    // Validation: Category required
+    if (!task.categoryId || task.categoryId <= 0) {
+      errors['category'] = 'Category is required';
     }
 
-    // Validação: Prioridade entre 1 e 5
-    if (tarefa.prioridade < 1 || tarefa.prioridade > 5) {
-      erros['prioridade'] = 'Prioridade deve ser entre 1 e 5';
+    // Validation: Priority between 1 and 5
+    if (task.priority < 1 || task.priority > 5) {
+      errors['priority'] = 'Priority must be between 1 and 5';
     }
 
-    this.erros.set(erros);
-    return Object.keys(erros).length === 0;
+    this.errors.set(errors);
+    return Object.keys(errors).length === 0;
   }
 
   /**
-   * Salva tarefa (Create ou Update)
-   * CRUD: Operações de Criação e Atualização
-   * RELACIONAMENTO: Mantém categoriaId da tarefa
-   * VALIDAÇÃO: Valida campos antes de salvar
+   * Save task (Create or Update)
+   * CRUD: Create and Update operations
+   * RELATIONSHIP: Maintains task categoryId
+   * VALIDATION: Validates fields before saving
    */
-  salvar() {
-    // Validação antes de salvar
-    if (!this.validar()) {
+  save() {
+    // Validation before saving
+    if (!this.validate()) {
       return;
     }
 
-    // Validação de tipos para relacionamento
-    // Converte categoriaId de string para number se necessário
-    const tarefa = this.tarefas();
-    if (typeof tarefa.categoriaId === 'string') {
-      tarefa.categoriaId = +tarefa.categoriaId;
+    // Type validation for relationship
+    // Convert categoryId from string to number if necessary
+    const task = this.task();
+    if (typeof task.categoryId === 'string') {
+      task.categoryId = +task.categoryId;
     }
     
     if(this.id) {
-      // CRUD: UPDATE - Edita tarefa existente
-      this.tarefasApiService.editar(this.id, tarefa).subscribe(() => {
-        alert('Tarefa editada com sucesso!');
-        // NAVEGAÇÃO SPA: Retorna para tabela
+      // CRUD: UPDATE - Edit existing task
+      this.tasksApiService.update(this.id, task).subscribe(() => {
+        alert('Task edited successfully!');
+        // SPA NAVIGATION: Return to table
         this.router.navigate(['/tabela']);
       });
     } else {
-      // CRUD: CREATE - Cria nova tarefa
-      this.tarefasApiService.inserir(tarefa).subscribe(() => {
-        alert('Tarefa cadastrada com sucesso!');
-        // Limpa formulário para nova entrada
-        this.tarefas.set({ id:0, titulo:'', descricao:'', prioridade:1, concluida:false, categoriaId: 1 });
-        this.erros.set({});
+      // CRUD: CREATE - Create new task
+      this.tasksApiService.insert(task).subscribe(() => {
+        alert('Task registered successfully!');
+        // Clear form for new entry
+        this.task.set({ id:0, title:'', description:'', priority:1, completed:false, categoryId: 1 });
+        this.errors.set({});
       });
     }
   }
 
   /**
-   * NAVEGAÇÃO SPA: Retorna para tabela de tarefas
+   * SPA NAVIGATION: Return to task table
    */
-  voltar() {
+  goBack() {
     this.router.navigate(['/tabela']);
   }
 }

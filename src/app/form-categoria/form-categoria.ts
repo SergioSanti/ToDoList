@@ -1,8 +1,8 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Categoria } from '../categoria';
-import { CategoriaApiService } from '../categoria-api-service';
+import { Category } from '../category';
+import { CategoriesApiService } from '../categories-api-service';
 
 @Component({
   selector: 'app-form-categoria',
@@ -12,70 +12,70 @@ import { CategoriaApiService } from '../categoria-api-service';
 })
 export class FormCategoria {
   id?: number;
-  categoria = signal<Categoria>({ id:0, nome:'', descricao:'', cor:'#007bff' });
-  botaoAcao = "Cadastrar";
-  // Validações
-  erros = signal<{[key: string]: string}>({});
+  category = signal<Category>({ id:0, name:'', description:'', color:'#007bff' });
+  actionButton = "Register";
+  // Validations
+  errors = signal<{[key: string]: string}>({});
 
-  categoriaApiService = inject(CategoriaApiService);
+  categoriesApiService = inject(CategoriesApiService);
   route = inject(ActivatedRoute);
   router = inject(Router);
 
   constructor() {
     const idParam = this.route.snapshot.params['id'];
-    this.id = idParam ? +idParam : undefined; // Converte string para number
+    this.id = idParam ? +idParam : undefined; // Convert string to number
     
     if(this.id) {
-      this.botaoAcao = "Editar";
-      this.categoriaApiService.buscarPorId(this.id).subscribe(c => {
-        this.categoria.set(c);
+      this.actionButton = "Edit";
+      this.categoriesApiService.findById(this.id).subscribe(c => {
+        this.category.set(c);
       });
     }
   }
 
   /**
-   * Valida os campos do formulário
-   * VALIDAÇÃO: Campos obrigatórios
+   * Validate form fields
+   * VALIDATION: Required fields
    */
-  validar(): boolean {
-    const erros: {[key: string]: string} = {};
-    const categoria = this.categoria();
+  validate(): boolean {
+    const errors: {[key: string]: string} = {};
+    const category = this.category();
 
-    // Validação: Nome obrigatório
-    if (!categoria.nome || categoria.nome.trim() === '') {
-      erros['nome'] = 'Nome é obrigatório';
+    // Validation: Name required
+    if (!category.name || category.name.trim() === '') {
+      errors['name'] = 'Name is required';
     }
 
-    // Validação: Descrição obrigatória
-    if (!categoria.descricao || categoria.descricao.trim() === '') {
-      erros['descricao'] = 'Descrição é obrigatória';
+    // Validation: Description required
+    if (!category.description || category.description.trim() === '') {
+      errors['description'] = 'Description is required';
     }
 
-    this.erros.set(erros);
-    return Object.keys(erros).length === 0;
+    this.errors.set(errors);
+    return Object.keys(errors).length === 0;
   }
 
-  salvar() {
-    // Validação antes de salvar
-    if (!this.validar()) {
+  save() {
+    // Validation before saving
+    if (!this.validate()) {
       return;
     }
 
     if(this.id) {
-      this.categoriaApiService.editar(this.id, this.categoria()).subscribe(() => {
-        alert('Categoria editada com sucesso!');
+      this.categoriesApiService.update(this.id, this.category()).subscribe(() => {
+        alert('Category edited successfully!');
         this.router.navigate(['/tabela-categoria']);
       });
     } else {
-      this.categoriaApiService.inserir(this.categoria()).subscribe(() => {
-        alert('Categoria cadastrada com sucesso!');
-        this.categoria.set({ id:0, nome:'', descricao:'', cor:'#007bff' });
-        this.erros.set({});
+      this.categoriesApiService.insert(this.category()).subscribe(() => {
+        alert('Category registered successfully!');
+        this.category.set({ id:0, name:'', description:'', color:'#007bff' });
+        this.errors.set({});
       });
     }
   }
 
-  voltar() {
+  goBack() {
     this.router.navigate(['/tabela-categoria']);
   }
 }
