@@ -104,6 +104,30 @@ export class Dashboard implements OnInit {
   }
 
   /**
+   * Calculate completion rate from Edge Function data
+   * Calcula taxa de conclusão usando dados da Edge Function
+   */
+  getEdgeFunctionCompletionRate(): number {
+    const stats = this.edgeFunctionStats();
+    if (!stats) return 0;
+    
+    // Se a Edge Function retornar completionRate, usa ele
+    if (stats.completionRate !== undefined && stats.completionRate !== null) {
+      return Math.round(stats.completionRate * 100) / 100;
+    }
+    
+    // Caso contrário, calcula usando os dados da Edge Function
+    const activeTasks = stats.activeTasks || 0;
+    const completedTasks = stats.completedTasks || 0;
+    const totalNotDeleted = activeTasks + completedTasks;
+    
+    if (totalNotDeleted === 0) return 0;
+    
+    const rate = (completedTasks / totalNotDeleted) * 100;
+    return Math.round(rate * 100) / 100;
+  }
+
+  /**
    * EDGE FUNCTIONS: Load statistics from cloud function
    * BUSINESS FUNCTIONALITY: Uses Edge Function to process data
    */
@@ -114,6 +138,9 @@ export class Dashboard implements OnInit {
         this.edgeFunctionStats.set(stats);
         this.isLoadingStats.set(false);
         console.log('Edge Function Stats:', stats);
+        console.log('Active Tasks:', stats?.activeTasks);
+        console.log('Completed Tasks:', stats?.completedTasks);
+        console.log('Completion Rate:', stats?.completionRate);
       },
       error: (err) => {
         console.error('Error loading Edge Function stats:', err);

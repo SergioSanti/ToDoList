@@ -45,11 +45,13 @@ serve(async (req) => {
       throw error
     }
 
-    const totalTasks = tasks?.length || 0
+    // Filtrar tarefas não deletadas
     const activeTasks = tasks?.filter(t => !t.excluida) || []
-    const completedTasks = activeTasks.filter(t => t.concluida)
-    const pendingTasks = activeTasks.filter(t => !t.concluida)
+    const completedTasks = activeTasks.filter(t => t.concluida === true)
+    const pendingTasks = activeTasks.filter(t => t.concluida === false || !t.concluida)
     const deletedTasks = tasks?.filter(t => t.excluida) || []
+
+    const totalTasks = tasks?.length || 0
 
     const priorityDistribution = {
       1: activeTasks.filter(t => t.prioridade === 1).length,
@@ -59,9 +61,12 @@ serve(async (req) => {
       5: activeTasks.filter(t => t.prioridade === 5).length,
     }
 
-    const completionRate = activeTasks.length > 0 
-      ? (completedTasks.length / activeTasks.length) * 100 
-      : 0
+    // Calcular taxa de conclusão corretamente
+    // Taxa = (Completas / Total de Ativas) * 100
+    let completionRate = 0
+    if (activeTasks.length > 0) {
+      completionRate = (completedTasks.length / activeTasks.length) * 100
+    }
 
     let categoryStats = []
     if (!categoryId) {
@@ -74,7 +79,7 @@ serve(async (req) => {
           categoryId: cat.id,
           categoryName: cat.nome,
           taskCount: activeTasks.filter(t => t.categoria_id === cat.id).length,
-          completedCount: activeTasks.filter(t => t.categoria_id === cat.id && t.concluida).length
+          completedCount: activeTasks.filter(t => t.categoria_id === cat.id && t.concluida === true).length
         }))
       }
     }
@@ -85,7 +90,7 @@ serve(async (req) => {
       completedTasks: completedTasks.length,
       pendingTasks: pendingTasks.length,
       deletedTasks: deletedTasks.length,
-      completionRate: Math.round(completionRate * 100) / 100,
+      completionRate: Math.round(completionRate * 100) / 100, // Arredonda para 2 casas decimais
       priorityDistribution,
       categoryStats,
       timestamp: new Date().toISOString()
@@ -108,4 +113,3 @@ serve(async (req) => {
     )
   }
 })
-

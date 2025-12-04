@@ -6,7 +6,7 @@
     <div class="alert alert-info mb-4">
       <h5>Estatísticas</h5>
       <p class="mb-1">
-        <strong>Taxa de Conclusão:</strong> {{edgeFunctionStats()?.completionRate || 0}}% | 
+        <strong>Taxa de Conclusão:</strong> {{getEdgeFunctionCompletionRate()}}% | 
         <strong>Processado em:</strong> {{formatTimestamp(edgeFunctionStats()?.timestamp)}}
       </p>
       @if (edgeFunctionStats()?.categoryStats && edgeFunctionStats().categoryStats.length > 0) {
