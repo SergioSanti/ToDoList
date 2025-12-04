@@ -195,53 +195,48 @@ export class Dashboard implements OnInit {
     console.log('Using StorageService, filePath:', filePath);
     
     // Use StorageService download method (works with authentication)
-      this.storageService.downloadFile(filePath).subscribe({
-        next: (blob) => {
-          if (!blob || blob.size === 0) {
-            throw new Error('Empty blob received');
-          }
-          
-          // Get MIME type
-          const extension = fileName.split('.').pop()?.toLowerCase() || '';
-          let mimeType = blob.type || 'application/octet-stream';
-          
-          if (!mimeType || mimeType === 'application/octet-stream') {
-            if (extension === 'png') mimeType = 'image/png';
-            else if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
-            else if (extension === 'gif') mimeType = 'image/gif';
-            else if (extension === 'pdf') mimeType = 'application/pdf';
-            else if (extension === 'webp') mimeType = 'image/webp';
-          }
-          
-          // Create blob with correct MIME type
-          const typedBlob = new Blob([blob], { type: mimeType });
-          
-          // Create download link
-          const url = window.URL.createObjectURL(typedBlob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = fileName;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          
-          // Cleanup
-          setTimeout(() => {
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-          }, 100);
-        },
-        error: (err) => {
-          console.error('StorageService download error:', err);
-          // Fallback to fetch
-          this.downloadViaFetch(fileUrl, fileName);
+    this.storageService.downloadFile(filePath).subscribe({
+      next: (blob) => {
+        if (!blob || blob.size === 0) {
+          throw new Error('Empty blob received');
         }
-      });
-    } else {
-      // No file path found, try direct fetch
-      console.log('No file path found, using direct fetch');
-      this.downloadViaFetch(fileUrl, fileName);
-    }
+        
+        // Get MIME type
+        const extension = fileName.split('.').pop()?.toLowerCase() || '';
+        let mimeType = blob.type || 'application/octet-stream';
+        
+        if (!mimeType || mimeType === 'application/octet-stream') {
+          if (extension === 'png') mimeType = 'image/png';
+          else if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
+          else if (extension === 'gif') mimeType = 'image/gif';
+          else if (extension === 'pdf') mimeType = 'application/pdf';
+          else if (extension === 'webp') mimeType = 'image/webp';
+        }
+        
+        // Create blob with correct MIME type
+        const typedBlob = new Blob([blob], { type: mimeType });
+        
+        // Create download link
+        const url = window.URL.createObjectURL(typedBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        setTimeout(() => {
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        }, 100);
+      },
+      error: (err) => {
+        console.error('StorageService download error:', err);
+        // Fallback to fetch
+        this.downloadViaFetch(fileUrl, fileName);
+      }
+    });
   }
 
   /**
