@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CategoriesApiService } from '../categories-api-service';
+import { TasksApiService } from '../tasks-api-service';
 import { Category } from '../category';
 
 @Component({
@@ -15,6 +16,7 @@ import { Category } from '../category';
 export class TabelaCategoria {
   categoryList = signal<Category[]>([]);
   private categoriesApiService = inject(CategoriesApiService);
+  private tasksApiService = inject(TasksApiService);
 
   constructor() {
     this.categoriesApiService.list().subscribe((categories) => {
@@ -23,11 +25,38 @@ export class TabelaCategoria {
   }
 
   delete(id: number) {
-    if (confirm('Are you sure you want to delete this category?')) {
-      this.categoriesApiService.delete(id).subscribe(() => {
-        this.categoryList.set(this.categoryList().filter(c => c.id !== id));
-      });
-    }
+    // First, count how many tasks are related to this category
+    this.tasksApiService.countByCategory(id).subscribe(taskCount => {
+      const category = this.categoryList().find(c => c.id === id);
+      const categoryName = category?.name || 'esta categoria';
+      
+      let message = '';
+      if (taskCount > 0) {
+        message = `ATENÇÃO!\n\nAo deletar a categoria "${categoryName}", todas as ${taskCount} tarefa(s) relacionada(s) serão excluídas permanentemente.\n\nDeseja prosseguir?`;
+      } else {
+        message = `Tem certeza que deseja deletar a categoria "${categoryName}"?`;
+      }
+      
+      if (confirm(message)) {
+        // Delete tasks first, then category
+        if (taskCount > 0) {
+          // Delete all tasks related to this category
+          this.tasksApiService.deleteByCategory(id).subscribe(() => {
+            // Then delete the category
+            this.categoriesApiService.delete(id).subscribe(() => {
+              this.categoryList.set(this.categoryList().filter(c => c.id !== id));
+              alert(`Categoria "${categoryName}" e ${taskCount} tarefa(s) relacionada(s) foram excluídas com sucesso!`);
+            });
+          });
+        } else {
+          // No tasks, just delete the category
+          this.categoriesApiService.delete(id).subscribe(() => {
+            this.categoryList.set(this.categoryList().filter(c => c.id !== id));
+            alert(`Categoria "${categoryName}" foi excluída com sucesso!`);
+          });
+        }
+      }
+    });
   }
 
   getContrastColor(hexColor: string): string {

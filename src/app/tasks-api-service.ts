@@ -294,4 +294,33 @@ export class TasksApiService {
       })
     );
   }
+
+  /**
+   * COUNT - Count tasks by category ID
+   */
+  countByCategory(categoryId: number): Observable<number> {
+    const supabase = getSupabaseClient();
+    return from(
+      supabase
+        .from('tarefas')
+        .select('*', { count: 'exact', head: true })
+        .eq('categoria_id', categoryId)
+    ).pipe(
+      map(result => result.count || 0)
+    );
+  }
+
+  /**
+   * DELETE BY CATEGORY - Delete all tasks by category ID
+   */
+  deleteByCategory(categoryId: number): Observable<void> {
+    const supabase = getSupabaseClient();
+    return from(
+      supabase
+        .from('tarefas')
+        .update({ excluida: true })
+        .eq('categoria_id', categoryId)
+        .then(() => undefined)
+    );
+  }
 }
