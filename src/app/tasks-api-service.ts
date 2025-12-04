@@ -264,6 +264,20 @@ export class TasksApiService {
   }
 
   /**
+   * DELETE PERMANENTLY - Hard delete: physically removes task from database
+   */
+  deletePermanently(id: number): Observable<void> {
+    const supabase = getSupabaseClient();
+    return from(
+      supabase
+        .from('tarefas')
+        .delete()
+        .eq('id', id)
+        .then(() => undefined)
+    );
+  }
+
+  /**
    * RESTORE - Restore deleted task
    */
   restore(id: number): Observable<Task> {

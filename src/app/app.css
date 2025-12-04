@@ -136,68 +136,7 @@
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-/* Responsive Design */
-@media (max-width: 991px) {
-  .navbar-nav {
-    margin-top: 1rem;
-  }
-  
-  .navbar-nav .nav-link {
-    padding: 0.75rem 1rem !important;
-    margin: 0.25rem 0;
-    text-align: center;
-  }
-  
-  .btn-logout {
-    margin: 0.5rem 0 0 0;
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .nav-text, .logout-text {
-    display: inline-block;
-  }
-
-  .system-title {
-    font-size: 1.8rem;
-    letter-spacing: 1px;
-  }
-
-  .system-header {
-    padding: 1rem 0;
-  }
-
-  .btn-logout-fixed {
-    width: 45px;
-    height: 45px;
-    top: 0.5rem;
-    right: 0.5rem;
-    font-size: 1.3rem;
-  }
-
-  .logout-icon-fixed {
-    font-size: 1.5rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .system-title {
-    font-size: 1.5rem;
-    letter-spacing: 0.5px;
-  }
-
-  .btn-logout-fixed {
-    width: 40px;
-    height: 40px;
-    top: 0.5rem;
-    right: 0.5rem;
-    font-size: 1.2rem;
-  }
-
-  .logout-icon-fixed {
-    font-size: 1.3rem;
-  }
-}
+/* Static Design - Same layout for all screen sizes */
 
 /* Smooth transitions */
 * {

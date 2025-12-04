@@ -314,15 +314,90 @@ export class Dashboard implements OnInit {
   }
 
   /**
-   * Delete task (soft delete)
+   * Show delete dialog with options
+   */
+  private showDeleteDialog(): Promise<'soft' | 'hard' | 'cancel'> {
+    return new Promise((resolve) => {
+      // Show initial dialog with options
+      const message = 'O que deseja fazer com esta tarefa?\n\n' +
+        'Digite:\n' +
+        '1 - Para Mover para excluídas\n' +
+        '2 - Para Excluir Permanentemente\n' +
+        '3 - Para Cancelar';
+      
+      const choice = prompt(message);
+      
+      if (choice === '1') {
+        // Soft delete
+        resolve('soft');
+      } else if (choice === '2') {
+        // Hard delete - ask for confirmation
+        if (confirm('⚠️ ATENÇÃO: Esta ação não pode ser desfeita!\n\n' +
+                   'A tarefa e seu arquivo anexado (se houver) serão permanentemente removidos.\n\n' +
+                   'Deseja realmente excluir permanentemente?')) {
+          resolve('hard');
+        } else {
+          resolve('cancel');
+        }
+      } else {
+        // Cancel or invalid input
+        resolve('cancel');
+      }
+    });
+  }
+
+  /**
+   * Delete task with options (soft delete or permanent delete)
    */
   deleteTask(id: number) {
-    if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-      this.tasksApiService.delete(id).subscribe(() => {
-        this.loadData(); // Recarrega os dados
-        this.loadEdgeFunctionStats(); // Reload Edge Function stats
-      });
-    }
+    this.showDeleteDialog().then((choice) => {
+      if (choice === 'soft') {
+        // Soft delete: move to deleted
+        this.tasksApiService.delete(id).subscribe(() => {
+          this.loadData(); // Recarrega os dados
+          this.loadEdgeFunctionStats(); // Reload Edge Function stats
+        });
+      } else if (choice === 'hard') {
+        // Hard delete: delete permanently
+        const task = this.allTasks().find(t => t.id === id);
+        if (task?.fileUrl) {
+          // Delete file from storage first
+          const filePath = this.storageService.extractFilePath(task.fileUrl);
+          if (filePath) {
+            this.storageService.deleteFile(filePath).subscribe({
+              next: () => {
+                // Then delete task from database
+                this.tasksApiService.deletePermanently(id).subscribe(() => {
+                  this.loadData();
+                  this.loadEdgeFunctionStats();
+                });
+              },
+              error: (err) => {
+                console.error('Erro ao deletar arquivo:', err);
+                // Delete task anyway
+                this.tasksApiService.deletePermanently(id).subscribe(() => {
+                  this.loadData();
+                  this.loadEdgeFunctionStats();
+                });
+              }
+            });
+          } else {
+            // No file, just delete task
+            this.tasksApiService.deletePermanently(id).subscribe(() => {
+              this.loadData();
+              this.loadEdgeFunctionStats();
+            });
+          }
+        } else {
+          // No file, just delete task
+          this.tasksApiService.deletePermanently(id).subscribe(() => {
+            this.loadData();
+            this.loadEdgeFunctionStats();
+          });
+        }
+      }
+      // If choice === 'cancel', do nothing
+    });
   }
 
   /**
