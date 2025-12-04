@@ -115,25 +115,20 @@ export class TabelaTarefas implements OnInit {
    * Open file in new tab - Simple and reliable
    */
   openFileViewer(fileUrl: string, fileName?: string) {
-    // Extract file path and rebuild URL if needed
-    const urlParts = fileUrl.split('/tarefas-arquivos/');
-    let finalUrl = fileUrl;
+    console.log('Open viewer requested:', { fileUrl, fileName });
     
-    if (urlParts.length > 1) {
-      // Full URL already, use as is
-      finalUrl = fileUrl;
-    } else if (fileUrl.includes('tarefas-arquivos/')) {
-      // Partial URL, try to fix
-      const altParts = fileUrl.split('tarefas-arquivos/');
-      if (altParts.length > 1) {
-        const filePath = altParts[1];
-        // Rebuild public URL
-        finalUrl = this.storageService.getFileUrl(filePath);
-      }
-    } else if (!fileUrl.startsWith('http')) {
-      // Just a path, rebuild URL
-      finalUrl = this.storageService.getFileUrl(fileUrl);
+    // Extract file path from URL
+    const filePath = this.storageService.extractFilePath(fileUrl);
+    
+    if (!filePath) {
+      console.error('Could not extract file path from URL:', fileUrl);
+      alert('Erro: URL do arquivo inválida.');
+      return;
     }
+    
+    // Get public URL (always use getFileUrl to ensure correct URL)
+    const finalUrl = this.storageService.getFileUrl(filePath);
+    console.log('Final URL for viewer:', finalUrl);
     
     // Simply open in new tab - this always works
     window.open(finalUrl, '_blank', 'noopener,noreferrer');
@@ -145,22 +140,18 @@ export class TabelaTarefas implements OnInit {
   downloadFile(fileUrl: string, fileName: string) {
     console.log('Download requested:', { fileUrl, fileName });
     
-    // Extract file path from URL
-    const urlParts = fileUrl.split('/tarefas-arquivos/');
-    let filePath = '';
+    // Extract file path from URL using StorageService method
+    const filePath = this.storageService.extractFilePath(fileUrl);
     
-    if (urlParts.length > 1) {
-      filePath = urlParts[1];
-    } else if (fileUrl.includes('tarefas-arquivos/')) {
-      const altParts = fileUrl.split('tarefas-arquivos/');
-      if (altParts.length > 1) {
-        filePath = altParts[1];
-      }
+    if (!filePath) {
+      console.error('Could not extract file path from URL:', fileUrl);
+      alert('Erro: URL do arquivo inválida.');
+      return;
     }
     
-    if (filePath) {
-      // Use StorageService download method
-      console.log('Using StorageService, filePath:', filePath);
+    console.log('Using StorageService, filePath:', filePath);
+    
+    // Use StorageService download method
       this.storageService.downloadFile(filePath).subscribe({
         next: (blob) => {
           if (!blob || blob.size === 0) {

@@ -21,12 +21,18 @@ export class StorageService {
 
   /**
    * UPLOAD - Upload file to Supabase Storage
-   * @param file - File to upload
+   * @param file - File to upload (must be a File object, NOT FormData!)
    * @param taskId - Task ID to associate the file
    * @returns Observable with file path
    */
   uploadFile(file: File, taskId: number): Observable<{ path: string; url: string }> {
     const supabase = getSupabaseClient();
+    
+    // Validate that we have a File object, not FormData
+    if (!(file instanceof File)) {
+      console.error('Invalid file type. Expected File object, got:', typeof file);
+      throw new Error('Arquivo inválido. Deve ser um objeto File.');
+    }
     
     // Generate unique file name: taskId-timestamp-originalname
     const fileExt = file.name.split('.').pop();
@@ -41,9 +47,12 @@ export class StorageService {
       filePath,
       mimeType,
       size: file.size,
-      type: file.type
+      type: file.type,
+      isFile: file instanceof File
     });
 
+    // CRITICAL: Pass File object directly, NOT FormData!
+    // Supabase Storage SDK handles File objects correctly
     return from(
       supabase.storage
         .from(this.BUCKET_NAME)
@@ -177,6 +186,38 @@ export class StorageService {
           return result.data?.some(file => file.name === fileName) || false;
         })
     );
+  }
+
+  /**
+   * Extract file path from full Supabase Storage URL
+   * @param fileUrl - Full URL or path
+   * @returns File path (e.g., "4/4-1764815718886.PNG")
+   */
+  extractFilePath(fileUrl: string): string {
+    if (!fileUrl) return '';
+    
+    // If it's already a path (no http), return as is
+    if (!fileUrl.startsWith('http')) {
+      return fileUrl;
+    }
+    
+    // Extract path from URL: https://...supabase.co/storage/v1/object/public/tarefas-arquivos/4/4-1764815718886.PNG
+    const urlParts = fileUrl.split('/tarefas-arquivos/');
+    if (urlParts.length > 1) {
+      return urlParts[1].split('?')[0]; // Remove query params if any
+    }
+    
+    // Try alternative patterns
+    if (fileUrl.includes('tarefas-arquivos/')) {
+      const altParts = fileUrl.split('tarefas-arquivos/');
+      if (altParts.length > 1) {
+        return altParts[1].split('?')[0];
+      }
+    }
+    
+    // If no pattern matches, return empty (invalid URL)
+    console.warn('Could not extract file path from URL:', fileUrl);
+    return '';
   }
 }
 
