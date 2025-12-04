@@ -184,12 +184,21 @@ export class Dashboard implements OnInit {
       finalUrl = this.storageService.getFileUrl(fileUrl);
     }
     
+    // For PDFs, ensure URL is direct and doesn't have query params that might break iframe
+    const extension = finalUrl.split('.').pop()?.toLowerCase() || '';
+    if (extension === 'pdf') {
+      // Remove any existing query params or fragments that might interfere
+      const urlObj = new URL(finalUrl);
+      urlObj.search = ''; // Clear query params
+      urlObj.hash = ''; // Clear hash
+      finalUrl = urlObj.toString();
+    }
+    
     console.log('Final URL for viewer:', finalUrl);
     this.currentFileUrl.set(finalUrl);
     this.currentFileName.set(fileName || 'Arquivo');
     
     // Detectar tipo de arquivo pela extensão
-    const extension = finalUrl.split('.').pop()?.toLowerCase() || '';
     if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(extension)) {
       this.currentFileType.set('image');
     } else if (extension === 'pdf') {

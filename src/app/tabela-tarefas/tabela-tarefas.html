@@ -35,9 +35,13 @@
                 (error)="onImageError($event)">
             } @else if (currentFileType() === 'pdf') {
               <iframe 
-                [src]="currentFileUrl() + '#toolbar=1'" 
+                [src]="currentFileUrl()" 
                 style="width: 100%; height: 70vh; border: 1px solid #ddd; border-radius: 4px;"
-                crossorigin="anonymous">
+                type="application/pdf"
+                frameborder="0">
+                <p class="text-muted">Seu navegador não suporta visualização de PDF. 
+                  <a [href]="currentFileUrl()" target="_blank" class="btn btn-primary btn-sm">Abrir em nova aba</a>
+                </p>
               </iframe>
             } @else {
               <p class="text-muted">Visualização não disponível para este tipo de arquivo.</p>
