@@ -51,15 +51,22 @@ export class StorageService {
       isFile: file instanceof File
     });
 
-    // CRITICAL: Pass File object directly, NOT FormData!
-    // Supabase Storage SDK handles File objects correctly
+    // CRITICAL: Read file as ArrayBuffer to ensure clean binary data
+    // This prevents any multipart form-data from being included
     return from(
-      supabase.storage
-        .from(this.BUCKET_NAME)
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: mimeType // IMPORTANTE: Define o tipo MIME correto
+      file.arrayBuffer()
+        .then(arrayBuffer => {
+          // Convert ArrayBuffer to Blob with correct MIME type
+          const blob = new Blob([arrayBuffer], { type: mimeType });
+          
+          // Upload the Blob (clean binary data, no multipart headers)
+          return supabase.storage
+            .from(this.BUCKET_NAME)
+            .upload(filePath, blob, {
+              cacheControl: '3600',
+              upsert: false,
+              contentType: mimeType // IMPORTANTE: Define o tipo MIME correto
+            });
         })
         .then(async (result) => {
           if (result.error) {
