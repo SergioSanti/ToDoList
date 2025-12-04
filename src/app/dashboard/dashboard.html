@@ -4,7 +4,7 @@
   <!-- EDGE FUNCTIONS: Estatísticas processadas na nuvem -->
   @if (edgeFunctionStats()) {
     <div class="alert alert-info mb-4">
-      <h5>📊 Estatísticas Processadas</h5>
+      <h5>Estatísticas</h5>
       <p class="mb-1">
         <strong>Taxa de Conclusão:</strong> {{edgeFunctionStats()?.completionRate || 0}}% | 
         <strong>Processado em:</strong> {{formatTimestamp(edgeFunctionStats()?.timestamp)}}
@@ -61,14 +61,6 @@
         <div class="card-body">
           <h5 class="card-title">Tarefas Excluídas</h5>
           <h2 class="card-text">{{totalDeleted()}}</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-2 mb-3">
-      <div class="card text-white bg-secondary">
-        <div class="card-body">
-          <h5 class="card-title">Taxa de Conclusão</h5>
-          <h2 class="card-text">{{calculateCompletionRate()}}%</h2>
         </div>
       </div>
     </div>
@@ -133,13 +125,19 @@
                         </div>
                       </div>
 
-                      <!-- Botão para marcar como concluída -->
-                      <div class="mt-2">
+                      <!-- Botões de ação -->
+                      <div class="mt-2 d-grid gap-2">
                         <button 
-                          class="btn btn-sm btn-success w-100" 
+                          class="btn btn-sm btn-success" 
                           (click)="toggleComplete(task)"
                           title="Marcar como completa">
                           ✓ Marcar como Completa
+                        </button>
+                        <button 
+                          class="btn btn-sm btn-danger" 
+                          (click)="deleteTask(task.id)"
+                          title="Excluir tarefa">
+                          🗑️ Excluir
                         </button>
                       </div>
                     </div>
@@ -214,13 +212,19 @@
                         </div>
                       </div>
 
-                      <!-- Botão para marcar como pendente -->
-                      <div class="mt-2">
+                      <!-- Botões de ação -->
+                      <div class="mt-2 d-grid gap-2">
                         <button 
-                          class="btn btn-sm btn-warning w-100" 
+                          class="btn btn-sm btn-warning" 
                           (click)="toggleComplete(task)"
                           title="Marcar como pendente">
                           ↩️ Marcar como Pendente
+                        </button>
+                        <button 
+                          class="btn btn-sm btn-danger" 
+                          (click)="deleteTask(task.id)"
+                          title="Excluir tarefa">
+                          🗑️ Excluir
                         </button>
                       </div>
                     </div>

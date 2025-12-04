@@ -66,6 +66,11 @@ export class Dashboard implements OnInit {
       const completed = tasks.filter(t => !t.deleted && t.completed); // Não deletadas E concluídas
       const deleted = tasks.filter(t => t.deleted);
       
+      // Ordenar por prioridade (5 = maior, 1 = menor) - ordem decrescente
+      active.sort((a, b) => b.priority - a.priority);
+      completed.sort((a, b) => b.priority - a.priority);
+      deleted.sort((a, b) => b.priority - a.priority);
+      
       this.activeTasks.set(active);
       this.completedTasks.set(completed);
       this.deletedTasks.set(deleted);
@@ -132,6 +137,18 @@ export class Dashboard implements OnInit {
       this.loadData(); // Recarrega os dados
       this.loadEdgeFunctionStats(); // Reload Edge Function stats
     });
+  }
+
+  /**
+   * Delete task (soft delete)
+   */
+  deleteTask(id: number) {
+    if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+      this.tasksApiService.delete(id).subscribe(() => {
+        this.loadData(); // Recarrega os dados
+        this.loadEdgeFunctionStats(); // Reload Edge Function stats
+      });
+    }
   }
 
   /**
