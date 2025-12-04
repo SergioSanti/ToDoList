@@ -39,7 +39,6 @@ export class StorageService {
     const filePath = `${taskId}/${fileName}`;
 
     // Get correct MIME type - ALWAYS detect from extension to avoid wrong types
-    // Some browsers report wrong MIME types, so we force detection from extension
     const mimeType = this.getMimeTypeFromExtension(fileExt);
 
     console.log('Uploading file:', {
@@ -50,17 +49,19 @@ export class StorageService {
       originalType: file.type
     });
 
-    // Upload File directly with explicit MIME type
-    // Use file.slice() to create a new File with correct MIME type
-    const fileWithCorrectType = new File([file], file.name, { type: mimeType });
-    
+    // CRITICAL: Convert to ArrayBuffer to ensure correct MIME type
+    // Supabase sometimes ignores contentType when using File directly
     return from(
-      supabase.storage
-        .from(this.BUCKET_NAME)
-        .upload(filePath, fileWithCorrectType, {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: mimeType // CRITICAL: Force correct MIME type
+      file.arrayBuffer()
+        .then(arrayBuffer => {
+          // Upload ArrayBuffer with explicit contentType
+          return supabase.storage
+            .from(this.BUCKET_NAME)
+            .upload(filePath, arrayBuffer, {
+              cacheControl: '3600',
+              upsert: false,
+              contentType: mimeType // CRITICAL: This works with ArrayBuffer
+            });
         })
         .then(async (result) => {
           if (result.error) {
