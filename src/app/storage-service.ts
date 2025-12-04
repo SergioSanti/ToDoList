@@ -21,52 +21,46 @@ export class StorageService {
 
   /**
    * UPLOAD - Upload file to Supabase Storage
-   * @param file - File to upload (must be a File object, NOT FormData!)
+   * @param file - File to upload (must be a File object)
    * @param taskId - Task ID to associate the file
    * @returns Observable with file path
    */
   uploadFile(file: File, taskId: number): Observable<{ path: string; url: string }> {
     const supabase = getSupabaseClient();
     
-    // Validate that we have a File object, not FormData
+    // Validate file type
     if (!(file instanceof File)) {
-      console.error('Invalid file type. Expected File object, got:', typeof file);
       throw new Error('Arquivo inválido. Deve ser um objeto File.');
     }
     
-    // Generate unique file name: taskId-timestamp-originalname
-    const fileExt = file.name.split('.').pop();
+    // Generate unique file name
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || '';
     const fileName = `${taskId}-${Date.now()}.${fileExt}`;
     const filePath = `${taskId}/${fileName}`;
 
-    // Get correct MIME type from file
-    const mimeType = file.type || this.getMimeTypeFromExtension(fileExt || '');
+    // Get correct MIME type - ALWAYS detect from extension to avoid wrong types
+    // Some browsers report wrong MIME types, so we force detection from extension
+    const mimeType = this.getMimeTypeFromExtension(fileExt);
 
     console.log('Uploading file:', {
-      fileName: file.name,
+      originalName: file.name,
       filePath,
       mimeType,
       size: file.size,
-      type: file.type,
-      isFile: file instanceof File
+      originalType: file.type
     });
 
-    // CRITICAL: Read file as ArrayBuffer to ensure clean binary data
-    // This prevents any multipart form-data from being included
+    // Upload File directly with explicit MIME type
+    // Use file.slice() to create a new File with correct MIME type
+    const fileWithCorrectType = new File([file], file.name, { type: mimeType });
+    
     return from(
-      file.arrayBuffer()
-        .then(arrayBuffer => {
-          // Convert ArrayBuffer to Blob with correct MIME type
-          const blob = new Blob([arrayBuffer], { type: mimeType });
-          
-          // Upload the Blob (clean binary data, no multipart headers)
-          return supabase.storage
-            .from(this.BUCKET_NAME)
-            .upload(filePath, blob, {
-              cacheControl: '3600',
-              upsert: false,
-              contentType: mimeType // IMPORTANTE: Define o tipo MIME correto
-            });
+      supabase.storage
+        .from(this.BUCKET_NAME)
+        .upload(filePath, fileWithCorrectType, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: mimeType // CRITICAL: Force correct MIME type
         })
         .then(async (result) => {
           if (result.error) {
