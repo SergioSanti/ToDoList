@@ -19,18 +19,45 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    const supabase = createClient(supabaseUrl, supabaseKey)
-
+    
+    // Get authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      throw new Error('No authorization header')
+      return new Response(
+        JSON.stringify({ error: 'No authorization header' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401,
+        }
+      )
     }
 
-    const token = authHeader.replace('Bearer ', '')
-    supabase.auth.setSession({ access_token: token, refresh_token: '' } as any)
+    // Create Supabase client with auth header in global headers
+    // This is the correct way to authenticate in Edge Functions
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: {
+          Authorization: authHeader,
+        },
+      },
+    })
 
+    // Verify user is authenticated
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized: Invalid or missing user session' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401,
+        }
+      )
+    }
+
+    // Get request body
     const { categoryId } = await req.json().catch(() => ({})) || {}
 
+    // BUSINESS FUNCTIONALITY: Query tasks and calculate statistics
     let query = supabase
       .from('tarefas')
       .select('*')
@@ -42,7 +69,18 @@ serve(async (req) => {
     const { data: tasks, error } = await query
 
     if (error) {
-      throw error
+      console.error('Database error:', error)
+      return new Response(
+        JSON.stringify({ 
+          error: error.message, 
+          details: error,
+          hint: 'Check RLS policies in Supabase'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      )
     }
 
     // Filtrar tarefas não deletadas
@@ -70,11 +108,13 @@ serve(async (req) => {
 
     let categoryStats = []
     if (!categoryId) {
-      const { data: categories } = await supabase
+      const { data: categories, error: catError } = await supabase
         .from('categorias')
         .select('id, nome')
 
-      if (categories) {
+      if (catError) {
+        console.error('Categories error:', catError)
+      } else if (categories) {
         categoryStats = categories.map(cat => ({
           categoryId: cat.id,
           categoryName: cat.nome,
@@ -93,7 +133,13 @@ serve(async (req) => {
       completionRate: Math.round(completionRate * 100) / 100, // Arredonda para 2 casas decimais
       priorityDistribution,
       categoryStats,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      debug: {
+        tasksFound: tasks?.length || 0,
+        activeTasksCount: activeTasks.length,
+        completedTasksCount: completedTasks.length,
+        userId: user?.id
+      }
     }
 
     return new Response(
@@ -104,11 +150,12 @@ serve(async (req) => {
       },
     )
   } catch (error) {
+    console.error('Edge Function error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message, stack: error.stack }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
+        status: 500,
       },
     )
   }
