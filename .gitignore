@@ -7,6 +7,7 @@
 /bazel-out
 
 # Node
+node_modules/
 /node_modules
 npm-debug.log
 yarn-error.log
@@ -28,8 +29,12 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
-# Miscellaneous
+# Angular
+.angular/
+/.angular/
 /.angular/cache
+
+# Miscellaneous
 .sass-cache/
 /connect.lock
 /coverage
