@@ -182,6 +182,12 @@ export class Dashboard implements OnInit {
    * Close file viewer
    */
   closeFileViewer() {
+    // Clean up blob URL if it was created
+    const currentUrl = this.currentFileUrl();
+    if (currentUrl && currentUrl.startsWith('blob:')) {
+      window.URL.revokeObjectURL(currentUrl);
+    }
+    
     this.showFileViewer.set(false);
     this.currentFileUrl.set('');
     this.currentFileName.set('');
@@ -201,8 +207,28 @@ export class Dashboard implements OnInit {
       // Use StorageService to download as blob
       this.storageService.downloadFile(filePath).subscribe({
         next: (blob) => {
+          // Verify blob is valid
+          if (!blob || blob.size === 0) {
+            console.error('Invalid blob received');
+            this.downloadViaFetch(fileUrl, fileName);
+            return;
+          }
+          
+          // Get file extension to determine MIME type
+          const extension = fileName.split('.').pop()?.toLowerCase() || '';
+          let mimeType = 'application/octet-stream';
+          
+          if (extension === 'png') mimeType = 'image/png';
+          else if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
+          else if (extension === 'gif') mimeType = 'image/gif';
+          else if (extension === 'pdf') mimeType = 'application/pdf';
+          else if (extension === 'webp') mimeType = 'image/webp';
+          
+          // Create new blob with correct MIME type
+          const typedBlob = new Blob([blob], { type: mimeType });
+          
           // Create blob URL and trigger download
-          const blobUrl = window.URL.createObjectURL(blob);
+          const blobUrl = window.URL.createObjectURL(typedBlob);
           const link = document.createElement('a');
           link.href = blobUrl;
           link.download = fileName;
@@ -211,22 +237,63 @@ export class Dashboard implements OnInit {
           document.body.removeChild(link);
           
           // Clean up blob URL
-          window.URL.revokeObjectURL(blobUrl);
+          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
         },
         error: (err) => {
-          console.error('Error downloading file:', err);
-          // Fallback: try direct download
-          const link = document.createElement('a');
-          link.href = fileUrl;
-          link.download = fileName;
-          link.setAttribute('download', fileName);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          console.error('Error downloading file via StorageService:', err);
+          // Fallback: download via fetch
+          this.downloadViaFetch(fileUrl, fileName);
         }
       });
     } else {
-      // Fallback if URL format is unexpected
+      // Fallback: download via fetch
+      this.downloadViaFetch(fileUrl, fileName);
+    }
+  }
+
+  /**
+   * Download file via fetch as fallback
+   */
+  downloadViaFetch(fileUrl: string, fileName: string) {
+    fetch(fileUrl, {
+      method: 'GET',
+      mode: 'cors'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      // Get file extension to determine MIME type
+      const extension = fileName.split('.').pop()?.toLowerCase() || '';
+      let mimeType = 'application/octet-stream';
+      
+      if (extension === 'png') mimeType = 'image/png';
+      else if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
+      else if (extension === 'gif') mimeType = 'image/gif';
+      else if (extension === 'pdf') mimeType = 'application/pdf';
+      else if (extension === 'webp') mimeType = 'image/webp';
+      
+      // Create new blob with correct MIME type
+      const typedBlob = new Blob([blob], { type: mimeType });
+      
+      // Create blob URL and trigger download
+      const blobUrl = window.URL.createObjectURL(typedBlob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up blob URL
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
+    })
+    .catch(error => {
+      console.error('Error downloading file via fetch:', error);
+      // Last resort: direct download
       const link = document.createElement('a');
       link.href = fileUrl;
       link.download = fileName;
@@ -234,7 +301,7 @@ export class Dashboard implements OnInit {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    }
+    });
   }
 
   /**
