@@ -112,11 +112,9 @@ export class TabelaTarefas implements OnInit {
   }
 
   /**
-   * Open file viewer - Ensure correct URL
+   * Open file in new tab - Simple and reliable
    */
   openFileViewer(fileUrl: string, fileName?: string) {
-    console.log('Open viewer requested:', { fileUrl, fileName });
-    
     // Extract file path and rebuild URL if needed
     const urlParts = fileUrl.split('/tarefas-arquivos/');
     let finalUrl = fileUrl;
@@ -137,40 +135,8 @@ export class TabelaTarefas implements OnInit {
       finalUrl = this.storageService.getFileUrl(fileUrl);
     }
     
-    // For PDFs, ensure URL is direct and doesn't have query params that might break iframe
-    const extension = finalUrl.split('.').pop()?.toLowerCase() || '';
-    if (extension === 'pdf') {
-      // Remove any existing query params or fragments that might interfere
-      const urlObj = new URL(finalUrl);
-      urlObj.search = ''; // Clear query params
-      urlObj.hash = ''; // Clear hash
-      finalUrl = urlObj.toString();
-    }
-    
-    console.log('Final URL for viewer:', finalUrl);
-    this.currentFileUrl.set(finalUrl);
-    this.currentFileName.set(fileName || 'Arquivo');
-    
-    // Detectar tipo de arquivo pela extensão
-    if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(extension)) {
-      this.currentFileType.set('image');
-    } else if (extension === 'pdf') {
-      this.currentFileType.set('pdf');
-    } else {
-      this.currentFileType.set('other');
-    }
-    
-    this.showFileViewer.set(true);
-  }
-
-  /**
-   * Close file viewer
-   */
-  closeFileViewer() {
-    this.showFileViewer.set(false);
-    this.currentFileUrl.set('');
-    this.currentFileName.set('');
-    this.currentFileType.set('');
+    // Simply open in new tab - this always works
+    window.open(finalUrl, '_blank', 'noopener,noreferrer');
   }
 
   /**
@@ -335,22 +301,4 @@ export class TabelaTarefas implements OnInit {
     return category ? category.name : 'Sem categoria';
   }
 
-  /**
-   * Handle image loading error
-   */
-  onImageError(event: Event) {
-    const img = event.target as HTMLImageElement;
-    if (img) {
-      img.style.display = 'none';
-      // Show error message
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'alert alert-danger';
-      errorDiv.innerHTML = `
-        <p class="mb-1"><strong>Erro ao carregar imagem</strong></p>
-        <p class="mb-0 small text-muted">URL: ${this.currentFileUrl()}</p>
-        <p class="mb-0 small">Verifique se o arquivo existe e se as permissões estão corretas.</p>
-      `;
-      img.parentElement?.appendChild(errorDiv);
-    }
-  }
 }
