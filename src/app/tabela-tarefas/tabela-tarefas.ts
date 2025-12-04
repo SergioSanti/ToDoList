@@ -117,21 +117,37 @@ export class TabelaTarefas implements OnInit {
   }
 
   /**
-   * Open file viewer
+   * Open file viewer - Ensure correct URL
    */
   openFileViewer(fileUrl: string, fileName?: string) {
-    // Ensure URL is properly formatted
-    let url = fileUrl;
-    if (!url.startsWith('http')) {
-      url = url.startsWith('/') ? url : '/' + url;
+    console.log('Open viewer requested:', { fileUrl, fileName });
+    
+    // Extract file path and rebuild URL if needed
+    const urlParts = fileUrl.split('/tarefas-arquivos/');
+    let finalUrl = fileUrl;
+    
+    if (urlParts.length > 1) {
+      // Full URL already, use as is
+      finalUrl = fileUrl;
+    } else if (fileUrl.includes('tarefas-arquivos/')) {
+      // Partial URL, try to fix
+      const altParts = fileUrl.split('tarefas-arquivos/');
+      if (altParts.length > 1) {
+        const filePath = altParts[1];
+        // Rebuild public URL
+        finalUrl = this.storageService.getFileUrl(filePath);
+      }
+    } else if (!fileUrl.startsWith('http')) {
+      // Just a path, rebuild URL
+      finalUrl = this.storageService.getFileUrl(fileUrl);
     }
     
-    // Use original URL directly - if bucket is public, it should work
-    this.currentFileUrl.set(url);
+    console.log('Final URL for viewer:', finalUrl);
+    this.currentFileUrl.set(finalUrl);
     this.currentFileName.set(fileName || 'Arquivo');
     
     // Detectar tipo de arquivo pela extensão
-    const extension = url.split('.').pop()?.toLowerCase() || '';
+    const extension = finalUrl.split('.').pop()?.toLowerCase() || '';
     if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(extension)) {
       this.currentFileType.set('image');
     } else if (extension === 'pdf') {
@@ -154,22 +170,87 @@ export class TabelaTarefas implements OnInit {
   }
 
   /**
-   * Download file - Force download via fetch
+   * Download file - Use StorageService to ensure correct URL and permissions
    */
   downloadFile(fileUrl: string, fileName: string) {
-    // Force download by fetching and creating blob
+    console.log('Download requested:', { fileUrl, fileName });
+    
+    // Extract file path from URL
+    const urlParts = fileUrl.split('/tarefas-arquivos/');
+    let filePath = '';
+    
+    if (urlParts.length > 1) {
+      filePath = urlParts[1];
+    } else if (fileUrl.includes('tarefas-arquivos/')) {
+      const altParts = fileUrl.split('tarefas-arquivos/');
+      if (altParts.length > 1) {
+        filePath = altParts[1];
+      }
+    }
+    
+    if (filePath) {
+      // Use StorageService download method
+      console.log('Using StorageService, filePath:', filePath);
+      this.storageService.downloadFile(filePath).subscribe({
+        next: (blob) => {
+          if (!blob || blob.size === 0) {
+            throw new Error('Empty blob received');
+          }
+          
+          const extension = fileName.split('.').pop()?.toLowerCase() || '';
+          let mimeType = blob.type || 'application/octet-stream';
+          
+          if (!mimeType || mimeType === 'application/octet-stream') {
+            if (extension === 'png') mimeType = 'image/png';
+            else if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
+            else if (extension === 'gif') mimeType = 'image/gif';
+            else if (extension === 'pdf') mimeType = 'application/pdf';
+            else if (extension === 'webp') mimeType = 'image/webp';
+          }
+          
+          const typedBlob = new Blob([blob], { type: mimeType });
+          const url = window.URL.createObjectURL(typedBlob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = fileName;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          
+          setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          }, 100);
+        },
+        error: (err) => {
+          console.error('StorageService download error:', err);
+          this.downloadViaFetch(fileUrl, fileName);
+        }
+      });
+    } else {
+      this.downloadViaFetch(fileUrl, fileName);
+    }
+  }
+
+  /**
+   * Fallback download via fetch
+   */
+  downloadViaFetch(fileUrl: string, fileName: string) {
     fetch(fileUrl, {
       method: 'GET',
       mode: 'cors'
     })
     .then(response => {
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       return response.blob();
     })
     .then(blob => {
-      // Get MIME type from response or file extension
+      if (!blob || blob.size === 0) {
+        throw new Error('Empty blob received');
+      }
+      
       const extension = fileName.split('.').pop()?.toLowerCase() || '';
       let mimeType = blob.type || 'application/octet-stream';
       
@@ -181,10 +262,7 @@ export class TabelaTarefas implements OnInit {
         else if (extension === 'webp') mimeType = 'image/webp';
       }
       
-      // Create blob with correct MIME type
       const typedBlob = new Blob([blob], { type: mimeType });
-      
-      // Create download link
       const url = window.URL.createObjectURL(typedBlob);
       const link = document.createElement('a');
       link.href = url;
@@ -193,22 +271,14 @@ export class TabelaTarefas implements OnInit {
       document.body.appendChild(link);
       link.click();
       
-      // Cleanup
       setTimeout(() => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
       }, 100);
     })
     .catch(error => {
-      console.error('Download error:', error);
-      // Fallback: try direct download
-      const link = document.createElement('a');
-      link.href = fileUrl;
-      link.download = fileName;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      console.error('Fetch download error:', error);
+      alert(`Erro ao baixar arquivo: ${error.message}\n\nVerifique se o arquivo existe e se você tem permissão.`);
     });
   }
 
