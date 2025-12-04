@@ -196,14 +196,13 @@ export class Dashboard implements OnInit {
   }
 
   /**
-   * Download file - Forces real download instead of opening in browser
+   * Download file - Force download via fetch
    */
   downloadFile(fileUrl: string, fileName: string) {
-    // Use fetch to download the file directly from the public URL
+    // Force download by fetching and creating blob
     fetch(fileUrl, {
       method: 'GET',
-      mode: 'cors',
-      cache: 'default'
+      mode: 'cors'
     })
     .then(response => {
       if (!response.ok) {
@@ -212,42 +211,46 @@ export class Dashboard implements OnInit {
       return response.blob();
     })
     .then(blob => {
-      // Verify blob is valid
-      if (!blob || blob.size === 0) {
-        throw new Error('Invalid blob received');
+      // Get MIME type from response or file extension
+      const extension = fileName.split('.').pop()?.toLowerCase() || '';
+      let mimeType = blob.type || 'application/octet-stream';
+      
+      if (!mimeType || mimeType === 'application/octet-stream') {
+        if (extension === 'png') mimeType = 'image/png';
+        else if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
+        else if (extension === 'gif') mimeType = 'image/gif';
+        else if (extension === 'pdf') mimeType = 'application/pdf';
+        else if (extension === 'webp') mimeType = 'image/webp';
       }
       
-      // Get file extension to determine MIME type
-      const extension = fileName.split('.').pop()?.toLowerCase() || '';
-      let mimeType = 'application/octet-stream';
-      
-      if (extension === 'png') mimeType = 'image/png';
-      else if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
-      else if (extension === 'gif') mimeType = 'image/gif';
-      else if (extension === 'pdf') mimeType = 'application/pdf';
-      else if (extension === 'webp') mimeType = 'image/webp';
-      
-      // Create new blob with correct MIME type
+      // Create blob with correct MIME type
       const typedBlob = new Blob([blob], { type: mimeType });
       
-      // Create blob URL and trigger download
-      const blobUrl = window.URL.createObjectURL(typedBlob);
+      // Create download link
+      const url = window.URL.createObjectURL(typedBlob);
       const link = document.createElement('a');
-      link.href = blobUrl;
+      link.href = url;
       link.download = fileName;
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
       
-      // Clean up
+      // Cleanup
       setTimeout(() => {
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
+        window.URL.revokeObjectURL(url);
       }, 100);
     })
     .catch(error => {
-      console.error('Error downloading file:', error);
-      alert('Erro ao baixar arquivo. Tente novamente ou verifique as permissões.');
+      console.error('Download error:', error);
+      // Fallback: try direct download
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileName;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     });
   }
 

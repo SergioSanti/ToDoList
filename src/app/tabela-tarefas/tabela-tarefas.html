@@ -31,11 +31,13 @@
                 class="img-fluid" 
                 alt="{{currentFileName()}}" 
                 style="max-height: 70vh; max-width: 100%;"
+                crossorigin="anonymous"
                 (error)="onImageError($event)">
             } @else if (currentFileType() === 'pdf') {
               <iframe 
                 [src]="currentFileUrl() + '#toolbar=1'" 
-                style="width: 100%; height: 70vh; border: 1px solid #ddd; border-radius: 4px;">
+                style="width: 100%; height: 70vh; border: 1px solid #ddd; border-radius: 4px;"
+                crossorigin="anonymous">
               </iframe>
             } @else {
               <p class="text-muted">Visualização não disponível para este tipo de arquivo.</p>
