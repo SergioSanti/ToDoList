@@ -23,8 +23,20 @@
                 {{category.color}}
               </span>
             </td>
-            <td><a class="btn btn-primary btn-sm" routerLink="/edit-categoria/{{category.id}}">Editar</a></td>
-            <td><a class="btn btn-danger btn-sm" (click)="delete(category.id)">Deletar</a></td>
+            <td>
+              @if (category.name !== 'Sem categoria') {
+                <a class="btn btn-primary btn-sm" routerLink="/edit-categoria/{{category.id}}">Editar</a>
+              } @else {
+                <span class="text-muted">-</span>
+              }
+            </td>
+            <td>
+              @if (category.name !== 'Sem categoria') {
+                <a class="btn btn-danger btn-sm" (click)="delete(category.id)">Deletar</a>
+              } @else {
+                <span class="text-muted">-</span>
+              }
+            </td>
           </tr>
         }
       </tbody>

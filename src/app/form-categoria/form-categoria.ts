@@ -29,6 +29,11 @@ export class FormCategoria {
       this.actionButton = "Editar";
       this.categoriesApiService.findById(this.id).subscribe(c => {
         this.category.set(c);
+        // Prevent editing default category
+        if (c.name === 'Sem categoria') {
+          alert('A categoria "Sem categoria" não pode ser editada!');
+          this.router.navigate(['/tabela-categoria']);
+        }
       });
     }
   }
@@ -61,12 +66,23 @@ export class FormCategoria {
       return;
     }
 
+    // Prevent editing default category
+    if (this.id && this.category().name === 'Sem categoria') {
+      alert('A categoria "Sem categoria" não pode ser editada!');
+      return;
+    }
+
     if(this.id) {
       this.categoriesApiService.update(this.id, this.category()).subscribe(() => {
         alert('Categoria editada com sucesso!');
         this.router.navigate(['/tabela-categoria']);
       });
     } else {
+      // Prevent creating a category with the same name as default
+      if (this.category().name === 'Sem categoria') {
+        alert('Não é possível criar uma categoria com o nome "Sem categoria"!');
+        return;
+      }
       this.categoriesApiService.insert(this.category()).subscribe(() => {
         alert('Categoria cadastrada com sucesso!');
         this.category.set({ id:0, name:'', description:'', color:'#007bff' });

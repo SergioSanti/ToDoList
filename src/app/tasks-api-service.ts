@@ -323,4 +323,18 @@ export class TasksApiService {
         .then(() => undefined)
     );
   }
+
+  /**
+   * UPDATE CATEGORY FOR TASKS - Update category_id for all tasks of a category
+   */
+  updateCategoryForTasks(oldCategoryId: number, newCategoryId: number): Observable<void> {
+    const supabase = getSupabaseClient();
+    return from(
+      supabase
+        .from('tarefas')
+        .update({ categoria_id: newCategoryId })
+        .eq('categoria_id', oldCategoryId)
+        .then(() => undefined)
+    );
+  }
 }

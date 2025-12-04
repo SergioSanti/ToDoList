@@ -153,4 +153,52 @@ export class CategoriesApiService {
       })
     );
   }
+
+  /**
+   * GET OR CREATE DEFAULT CATEGORY - Get or create "Sem categoria" category
+   */
+  getOrCreateDefaultCategory(): Observable<Category> {
+    const supabase = getSupabaseClient();
+    const defaultCategoryName = 'Sem categoria';
+    
+    return from(
+      supabase
+        .from('categorias')
+        .select('*')
+        .eq('nome', defaultCategoryName)
+        .maybeSingle()
+        .then(async (result) => {
+          if (result.data) {
+            // Default category exists
+            const data = result.data as any;
+            return {
+              id: data.id,
+              name: data.nome,
+              description: data.descricao,
+              color: data.cor
+            } as Category;
+          } else {
+            // Create default category
+            const { data: newData, error } = await supabase
+              .from('categorias')
+              .insert({
+                nome: defaultCategoryName,
+                descricao: 'Categoria padrão para tarefas sem categoria',
+                cor: '#6c757d'
+              })
+              .select('*')
+              .single();
+            
+            if (error) throw error;
+            
+            return {
+              id: newData.id,
+              name: newData.nome,
+              description: newData.descricao,
+              color: newData.cor
+            } as Category;
+          }
+        })
+    );
+  }
 }
