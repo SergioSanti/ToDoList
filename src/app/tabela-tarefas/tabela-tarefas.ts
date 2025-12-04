@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { TasksApiService } from '../tasks-api-service';
 import { CategoriesApiService } from '../categories-api-service';
+import { StorageService } from '../storage-service';
 import { Task } from '../tasks';
 import { Category } from '../category';
 import { filter } from 'rxjs/operators';
@@ -74,6 +75,7 @@ export class TabelaTarefas implements OnInit {
   // Dependency injection
   private tasksApiService = inject(TasksApiService);
   private categoriesApiService = inject(CategoriesApiService);
+  private storageService = inject(StorageService);
   private router = inject(Router);
 
   constructor() {
@@ -118,11 +120,18 @@ export class TabelaTarefas implements OnInit {
    * Open file viewer
    */
   openFileViewer(fileUrl: string, fileName?: string) {
-    this.currentFileUrl.set(fileUrl);
+    // Ensure URL is properly formatted
+    let url = fileUrl;
+    if (!url.startsWith('http')) {
+      // If it's a relative path, make it absolute
+      url = url.startsWith('/') ? url : '/' + url;
+    }
+    
+    this.currentFileUrl.set(url);
     this.currentFileName.set(fileName || 'Arquivo');
     
     // Detectar tipo de arquivo pela extensão
-    const extension = fileUrl.split('.').pop()?.toLowerCase() || '';
+    const extension = url.split('.').pop()?.toLowerCase() || '';
     if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(extension)) {
       this.currentFileType.set('image');
     } else if (extension === 'pdf') {
@@ -145,16 +154,52 @@ export class TabelaTarefas implements OnInit {
   }
 
   /**
-   * Download file
+   * Download file - Forces real download instead of opening in browser
    */
   downloadFile(fileUrl: string, fileName: string) {
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.download = fileName;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Extract file path from URL
+    // URL format: https://...supabase.co/storage/v1/object/public/tarefas-arquivos/2/2-1764811978789.PNG
+    const urlParts = fileUrl.split('/tarefas-arquivos/');
+    if (urlParts.length > 1) {
+      const filePath = urlParts[1];
+      
+      // Use StorageService to download as blob
+      this.storageService.downloadFile(filePath).subscribe({
+        next: (blob) => {
+          // Create blob URL and trigger download
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Clean up blob URL
+          window.URL.revokeObjectURL(blobUrl);
+        },
+        error: (err) => {
+          console.error('Error downloading file:', err);
+          // Fallback: try direct download
+          const link = document.createElement('a');
+          link.href = fileUrl;
+          link.download = fileName;
+          link.setAttribute('download', fileName);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      });
+    } else {
+      // Fallback if URL format is unexpected
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileName;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   }
 
   /**
@@ -204,5 +249,24 @@ export class TabelaTarefas implements OnInit {
   getCategoryName(categoryId: number): string {
     const category = this.categories().find(c => c.id === categoryId);
     return category ? category.name : 'Sem categoria';
+  }
+
+  /**
+   * Handle image loading error
+   */
+  onImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.style.display = 'none';
+      // Show error message
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'alert alert-danger';
+      errorDiv.innerHTML = `
+        <p class="mb-1"><strong>Erro ao carregar imagem</strong></p>
+        <p class="mb-0 small text-muted">URL: ${this.currentFileUrl()}</p>
+        <p class="mb-0 small">Verifique se o arquivo existe e se as permissões estão corretas.</p>
+      `;
+      img.parentElement?.appendChild(errorDiv);
+    }
   }
 }
