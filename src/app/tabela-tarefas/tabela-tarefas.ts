@@ -123,34 +123,42 @@ export class TabelaTarefas implements OnInit {
     // Ensure URL is properly formatted
     let url = fileUrl;
     if (!url.startsWith('http')) {
-      // If it's a relative path, make it absolute
       url = url.startsWith('/') ? url : '/' + url;
     }
     
+    // Use original URL directly - if bucket is public, it should work
+    this.currentFileUrl.set(url);
     this.currentFileName.set(fileName || 'Arquivo');
     
     // Detectar tipo de arquivo pela extensão
     const extension = url.split('.').pop()?.toLowerCase() || '';
     if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(extension)) {
       this.currentFileType.set('image');
-      // For images, try to load via fetch to handle CORS
-      this.loadImageAsBlob(url);
     } else if (extension === 'pdf') {
       this.currentFileType.set('pdf');
-      this.currentFileUrl.set(url);
     } else {
       this.currentFileType.set('other');
-      this.currentFileUrl.set(url);
     }
     
     this.showFileViewer.set(true);
   }
 
   /**
-   * Load image as blob to handle CORS issues
+   * Close file viewer
    */
-  loadImageAsBlob(url: string) {
-    fetch(url, {
+  closeFileViewer() {
+    this.showFileViewer.set(false);
+    this.currentFileUrl.set('');
+    this.currentFileName.set('');
+    this.currentFileType.set('');
+  }
+
+  /**
+   * Download file - Forces real download instead of opening in browser
+   */
+  downloadFile(fileUrl: string, fileName: string) {
+    // Use fetch to download the file directly from the public URL
+    fetch(fileUrl, {
       method: 'GET',
       mode: 'cors',
       cache: 'default'
@@ -162,105 +170,11 @@ export class TabelaTarefas implements OnInit {
       return response.blob();
     })
     .then(blob => {
-      // Create object URL from blob
-      const blobUrl = window.URL.createObjectURL(blob);
-      this.currentFileUrl.set(blobUrl);
-    })
-    .catch(error => {
-      console.error('Error loading image:', error);
-      // Fallback to direct URL
-      this.currentFileUrl.set(url);
-    });
-  }
-
-  /**
-   * Close file viewer
-   */
-  closeFileViewer() {
-    // Clean up blob URL if it was created
-    const currentUrl = this.currentFileUrl();
-    if (currentUrl && currentUrl.startsWith('blob:')) {
-      window.URL.revokeObjectURL(currentUrl);
-    }
-    
-    this.showFileViewer.set(false);
-    this.currentFileUrl.set('');
-    this.currentFileName.set('');
-    this.currentFileType.set('');
-  }
-
-  /**
-   * Download file - Forces real download instead of opening in browser
-   */
-  downloadFile(fileUrl: string, fileName: string) {
-    // Extract file path from URL
-    // URL format: https://...supabase.co/storage/v1/object/public/tarefas-arquivos/2/2-1764811978789.PNG
-    const urlParts = fileUrl.split('/tarefas-arquivos/');
-    if (urlParts.length > 1) {
-      const filePath = urlParts[1];
-      
-      // Use StorageService to download as blob
-      this.storageService.downloadFile(filePath).subscribe({
-        next: (blob) => {
-          // Verify blob is valid
-          if (!blob || blob.size === 0) {
-            console.error('Invalid blob received');
-            this.downloadViaFetch(fileUrl, fileName);
-            return;
-          }
-          
-          // Get file extension to determine MIME type
-          const extension = fileName.split('.').pop()?.toLowerCase() || '';
-          let mimeType = 'application/octet-stream';
-          
-          if (extension === 'png') mimeType = 'image/png';
-          else if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
-          else if (extension === 'gif') mimeType = 'image/gif';
-          else if (extension === 'pdf') mimeType = 'application/pdf';
-          else if (extension === 'webp') mimeType = 'image/webp';
-          
-          // Create new blob with correct MIME type
-          const typedBlob = new Blob([blob], { type: mimeType });
-          
-          // Create blob URL and trigger download
-          const blobUrl = window.URL.createObjectURL(typedBlob);
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          link.download = fileName;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          // Clean up blob URL
-          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
-        },
-        error: (err) => {
-          console.error('Error downloading file via StorageService:', err);
-          // Fallback: download via fetch
-          this.downloadViaFetch(fileUrl, fileName);
-        }
-      });
-    } else {
-      // Fallback: download via fetch
-      this.downloadViaFetch(fileUrl, fileName);
-    }
-  }
-
-  /**
-   * Download file via fetch as fallback
-   */
-  downloadViaFetch(fileUrl: string, fileName: string) {
-    fetch(fileUrl, {
-      method: 'GET',
-      mode: 'cors'
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Verify blob is valid
+      if (!blob || blob.size === 0) {
+        throw new Error('Invalid blob received');
       }
-      return response.blob();
-    })
-    .then(blob => {
+      
       // Get file extension to determine MIME type
       const extension = fileName.split('.').pop()?.toLowerCase() || '';
       let mimeType = 'application/octet-stream';
@@ -279,23 +193,19 @@ export class TabelaTarefas implements OnInit {
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = fileName;
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
       
-      // Clean up blob URL
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }, 100);
     })
     .catch(error => {
-      console.error('Error downloading file via fetch:', error);
-      // Last resort: direct download
-      const link = document.createElement('a');
-      link.href = fileUrl;
-      link.download = fileName;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      console.error('Error downloading file:', error);
+      alert('Erro ao baixar arquivo. Tente novamente ou verifique as permissões.');
     });
   }
 
