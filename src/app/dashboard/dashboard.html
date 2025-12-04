@@ -66,6 +66,35 @@
     </div>
   </div>
 
+  <!-- Modal para Visualizar Arquivo -->
+  @if (showFileViewer()) {
+    <div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{currentFileName()}}</h5>
+            <button type="button" class="btn-close" (click)="closeFileViewer()" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            @if (currentFileType() === 'image') {
+              <img [src]="currentFileUrl()" class="img-fluid" alt="{{currentFileName()}}" style="max-height: 70vh;">
+            } @else if (currentFileType() === 'pdf') {
+              <iframe [src]="currentFileUrl()" style="width: 100%; height: 70vh; border: none;"></iframe>
+            } @else {
+              <p class="text-muted">Visualização não disponível para este tipo de arquivo.</p>
+            }
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeFileViewer()">Fechar</button>
+            <button type="button" class="btn btn-primary" (click)="downloadFile(currentFileUrl(), currentFileName())">
+              📥 Baixar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Tarefas Ativas em Cards -->
   <div class="row mb-4">
     <div class="col-12">
@@ -88,9 +117,24 @@
                       <!-- STORAGE: Exibir arquivo anexado -->
                       @if (task.fileUrl) {
                         <div class="mb-2">
-                          <a [href]="task.fileUrl" target="_blank" class="btn btn-sm btn-info">
-                            📎 {{task.fileName || 'Ver Arquivo'}}
-                          </a>
+                          @if (isViewableFile(task.fileUrl)) {
+                            <button 
+                              class="btn btn-sm btn-info" 
+                              (click)="openFileViewer(task.fileUrl, task.fileName || 'Arquivo')">
+                              👁️ Visualizar
+                            </button>
+                            <button 
+                              class="btn btn-sm btn-primary ms-2" 
+                              (click)="downloadFile(task.fileUrl, task.fileName || 'arquivo')">
+                              📥 Baixar
+                            </button>
+                          } @else {
+                            <button 
+                              class="btn btn-sm btn-primary" 
+                              (click)="downloadFile(task.fileUrl, task.fileName || 'arquivo')">
+                              📥 Baixar
+                            </button>
+                          }
                         </div>
                       }
                       
@@ -175,9 +219,24 @@
                       <!-- STORAGE: Exibir arquivo anexado -->
                       @if (task.fileUrl) {
                         <div class="mb-2">
-                          <a [href]="task.fileUrl" target="_blank" class="btn btn-sm btn-info">
-                            📎 {{task.fileName || 'Ver Arquivo'}}
-                          </a>
+                          @if (isViewableFile(task.fileUrl)) {
+                            <button 
+                              class="btn btn-sm btn-info" 
+                              (click)="openFileViewer(task.fileUrl, task.fileName || 'Arquivo')">
+                              👁️ Visualizar
+                            </button>
+                            <button 
+                              class="btn btn-sm btn-primary ms-2" 
+                              (click)="downloadFile(task.fileUrl, task.fileName || 'arquivo')">
+                              📥 Baixar
+                            </button>
+                          } @else {
+                            <button 
+                              class="btn btn-sm btn-primary" 
+                              (click)="downloadFile(task.fileUrl, task.fileName || 'arquivo')">
+                              📥 Baixar
+                            </button>
+                          }
                         </div>
                       }
                       

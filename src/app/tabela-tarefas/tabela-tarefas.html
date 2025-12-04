@@ -15,6 +15,35 @@
       placeholder="Pesquisar por título, descrição, ID, categoria ou prioridade...">
   </div>
 
+  <!-- Modal para Visualizar Arquivo -->
+  @if (showFileViewer()) {
+    <div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{currentFileName()}}</h5>
+            <button type="button" class="btn-close" (click)="closeFileViewer()" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            @if (currentFileType() === 'image') {
+              <img [src]="currentFileUrl()" class="img-fluid" alt="{{currentFileName()}}" style="max-height: 70vh;">
+            } @else if (currentFileType() === 'pdf') {
+              <iframe [src]="currentFileUrl()" style="width: 100%; height: 70vh; border: none;"></iframe>
+            } @else {
+              <p class="text-muted">Visualização não disponível para este tipo de arquivo.</p>
+            }
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeFileViewer()">Fechar</button>
+            <button type="button" class="btn btn-primary" (click)="downloadFile(currentFileUrl(), currentFileName())">
+              📥 Baixar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Tabela Desktop -->
   @if(filteredTasks().length > 0) {
     <!-- Desktop Table -->
@@ -47,9 +76,22 @@
               </td>
               <td>
                 @if (task.fileUrl) {
-                  <a [href]="task.fileUrl" target="_blank" class="btn btn-sm btn-info" title="Download">
-                    📎 {{task.fileName || 'Arquivo'}}
-                  </a>
+                  <div class="btn-group" role="group">
+                    @if (isViewableFile(task.fileUrl)) {
+                      <button 
+                        class="btn btn-sm btn-info" 
+                        (click)="openFileViewer(task.fileUrl, task.fileName || 'Arquivo')"
+                        title="Visualizar">
+                        👁️
+                      </button>
+                    }
+                    <button 
+                      class="btn btn-sm btn-primary" 
+                      (click)="downloadFile(task.fileUrl, task.fileName || 'arquivo')"
+                      title="Baixar">
+                      📥
+                    </button>
+                  </div>
                 } @else {
                   <span class="text-muted">-</span>
                 }
@@ -105,9 +147,20 @@
             <div class="row">
               <div class="col-12 col-label">ARQUIVO</div>
               <div class="col-12 col-value">
-                <a [href]="task.fileUrl" target="_blank" class="btn btn-sm btn-info w-100">
-                  📎 {{task.fileName || 'Download Arquivo'}}
-                </a>
+                <div class="btn-group w-100" role="group">
+                  @if (isViewableFile(task.fileUrl)) {
+                    <button 
+                      class="btn btn-sm btn-info" 
+                      (click)="openFileViewer(task.fileUrl, task.fileName || 'Arquivo')">
+                      👁️ Visualizar
+                    </button>
+                  }
+                  <button 
+                    class="btn btn-sm btn-primary" 
+                    (click)="downloadFile(task.fileUrl, task.fileName || 'arquivo')">
+                    📥 Baixar
+                  </button>
+                </div>
               </div>
             </div>
           }
