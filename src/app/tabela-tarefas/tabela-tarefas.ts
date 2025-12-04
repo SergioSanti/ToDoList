@@ -35,11 +35,6 @@ export class TabelaTarefas implements OnInit {
   taskList = signal<Task[]>([]);
   categories = signal<Category[]>([]);
 
-  // File viewer
-  showFileViewer = signal<boolean>(false);
-  currentFileUrl = signal<string>('');
-  currentFileName = signal<string>('');
-  currentFileType = signal<string>('');
 
   // Computed: Filtered tasks with comprehensive search
   filteredTasks = computed(() => {
